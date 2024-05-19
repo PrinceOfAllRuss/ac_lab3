@@ -15,3 +15,7 @@ class DataPath:
             return addr - 1
         else:
             addr
+
+    def start_stub(self, operation: dict):
+        print(operation)
+        return 0

@@ -3,13 +3,11 @@ from isa import opcode
 
 def write_str_to_memory(str_data, machine_code, index):
     for i in str_data:
-        machine_code += f"{{'index': {str(index)}, 'type': 'string', 'data': "
-        if i == "$":
-            machine_code += f"{0}}},\n"
-        else:
-            machine_code += f"{ord(i)}}},\n"
+        machine_code += f'{{"index": {str(index)}, "data": {ord(i)}}},\n'
         index += 1
-    return machine_code[:-3], index
+    machine_code += f'{{"index": {str(index)}, "data": {0}'
+
+    return machine_code, index
 
 def from_language_to_machine_code(program: str):
     program = re.sub("\s{4}", "", program)
@@ -24,7 +22,7 @@ def from_language_to_machine_code(program: str):
         if data[i] == ".code:":
             for j in range(i + 1, len(data)):
                 if data[j] in opcode:
-                    machine_code += f"{{'index': {str(index)}, 'operation': '{data[j]}'"
+                    machine_code += f'{{"index": {index}, "operation": "{data[j]}"'
                     if j == len(data) - 1:
                         machine_code += "},\n"
                         break
@@ -32,16 +30,15 @@ def from_language_to_machine_code(program: str):
                         machine_code += "}, "
                         index += 1
                     else:
-                        machine_code += ", 'arg': ["
+                        machine_code += ', "arg": ['
                 elif ":" in data[j]:
                     labels[data[j][:-1]] = index
                 else:
                     new_el = re.sub(r',', '', data[j])
-                    try:
-                        float(new_el)
-                        machine_code += f"{new_el}"
-                    except ValueError:
-                        machine_code += f"'{new_el}'"
+                    if "@" in new_el:
+                        machine_code += f'{new_el}'
+                    else:
+                        machine_code += f'{new_el}'
 
                     if data[j + 1] in opcode or ":" in data[j + 1]:
                         machine_code += "]},\n"
@@ -50,42 +47,48 @@ def from_language_to_machine_code(program: str):
                         machine_code += ", "
             break
 
-    starting_data_index = index + 1
-
     # Записываем все данные
+    dict_for_variable_names = {}
     i = 1
     while True:
         index += 1
-        if data[i + 1] == "number":
-            machine_code += f"{{'index': {index}, 'type': 'number', 'data': "
-            machine_code += f"{data[i + 2]}"
+        if "\"" not in data[i + 1]:
+            machine_code += f'{{"index": {index}, "data": '
+            machine_code += f"{data[i + 1]}"
+            dict_for_variable_names[data[i]] = index
         else:
-            str_data = ""
-            while "$" not in data[i + 2]:
-                str_data += f"{data[i + 2]} "
-                i += 1
+            dict_for_variable_names[data[i]] = index
+            if data[i + 1].count("\"") == 2:
+                str_data = re.sub("\"", "", data[i + 1])
             else:
-                str_data += f"{data[i + 2]}"
+                str_data = f"{data[i + 1]} "[1:]
+                i += 1
+                while "\"" not in data[i + 1]:
+                    str_data += f"{data[i + 1]} "
+                    i += 1
+                else:
+                    str_data += f"{data[i + 1]}"[:-1]
 
             machine_code, index = write_str_to_memory(str_data, machine_code, index)
 
-        if data[i + 3] == ".code:":
+        if data[i + 2] == ".code:":
             machine_code += "}]"
             break
         else:
             machine_code += "},\n"
-        i += 3
+        i += 2
 
     # Заменяем все регистры на адреса в памяти
-    all_registers = re.findall(r"[R\d]{2,}", machine_code)
+    all_registers = list(dict_for_variable_names.keys())
     for i in all_registers:
-        old_index = re.search("\d{1,}", i).group(0)
-        new_index = str(starting_data_index + int(old_index))
-        machine_code = re.sub(f"'R{old_index}'", new_index, machine_code)
+        new_index = dict_for_variable_names[i]
+        machine_code = re.sub(f'@{i}', f'@{new_index}', machine_code)
+        machine_code = re.sub(f'{i}', f'{new_index}', machine_code)
 
     # Заменяем все лейблы на адреса команд
-    for i in list(labels.keys()):
-        machine_code = re.sub(f"'{i}'", str(labels[i]), machine_code)
+    all_labels = list(labels.keys())
+    for i in all_labels:
+        machine_code = re.sub(f'{i}', f'@{labels[i]}', machine_code)
 
     f = open("machine_code.txt", "w+")
     f.write(machine_code)
