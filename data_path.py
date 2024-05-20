@@ -1,13 +1,17 @@
 class DataPath:
     def __init__(self, memory):
         self.memory = memory
+        self.address = 0
         self.acc = 0
-        self.buff = 0
-    def execute_command(self, addr, memory):
-        addr = self.data_address(addr, False, False)
+        self.port_latch = -1
+        self.alu = "+"
 
-        el = memory[addr]
-
+    def set_alu(self, operation):
+        self.alu = operation
+    def set_address(self, addr):
+        self.address = addr
+    def read_value(self):
+        self.mux_for_output()
     def data_address(self, addr, inc, dec):
         if inc:
             return addr + 1
@@ -15,7 +19,20 @@ class DataPath:
             return addr - 1
         else:
             addr
-
-    def start_stub(self, operation: dict):
-        print(operation)
-        return 0
+    def perform_alu_operation(self):
+        value_1 = self.memory[self.address]
+        value_2 = self.acc
+        if self.alu == "+":
+            self.acc = value_1 + value_2
+        else:
+            print("Now it doesn't work")
+    def write_value_to_memory_from_acc(self):
+        self.memory[self.address] = self.acc
+    def set_port_latch(self, port):
+        self.port_latch = port
+    def mux_for_output(self):
+        if self.port_latch == -1:
+            self.acc = self.memory[self.address]
+        if self.port_latch == 0:
+            print(self.memory[self.address])
+        return self.memory[self.address]

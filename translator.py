@@ -1,5 +1,6 @@
+import json
 import re
-from isa import opcode
+from isa import opcode, Operation
 
 def write_str_to_memory(str_data, machine_code, index):
     for i in str_data:
@@ -82,17 +83,34 @@ def from_language_to_machine_code(program: str):
     all_registers = list(dict_for_variable_names.keys())
     for i in all_registers:
         new_index = dict_for_variable_names[i]
-        machine_code = re.sub(f'@{i}', f'@{new_index}', machine_code)
+        machine_code = re.sub(f'@{i}', f'"@{new_index}"', machine_code)
         machine_code = re.sub(f'{i}', f'{new_index}', machine_code)
 
     # Заменяем все лейблы на адреса команд
     all_labels = list(labels.keys())
     for i in all_labels:
-        machine_code = re.sub(f'{i}', f'@{labels[i]}', machine_code)
+        machine_code = re.sub(f'{i}', f'"@{labels[i]}"', machine_code)
 
     f = open("machine_code.txt", "w+")
     f.write(machine_code)
     f.close()
 
-    print(data)
+    # print(data)
     print(machine_code)
+
+def from_machine_code_to_memory(machine_code, memory_size):
+    machine_array = json.loads(machine_code)
+    memory = [0] * memory_size
+    for i in range(len(machine_array)):
+        obj = machine_array[i]
+        keys = list(obj.keys())
+        index = obj["index"]
+        if keys[1] == "data":
+            memory[index] = obj["data"]
+        else:
+            if "arg" in keys:
+                operation = Operation(obj["operation"], obj["arg"])
+            else:
+                operation = Operation(obj["operation"], [])
+            memory[index] = operation
+    return memory
