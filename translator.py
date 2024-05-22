@@ -4,10 +4,17 @@ from isa import opcode_keys, Operation
 
 def write_str_to_memory(str_data, machine_code, index):
     for i in str_data:
-        machine_code += f'{{"index": {str(index)}, "data": {ord(i)}}},\n'
+        # if i == "$":
+        #     enter = "\n"
+        #     machine_code += f'{{"index": {str(index)}, "data": {enter}}},\n'
+        # else:
+        #     machine_code += f'{{"index": {str(index)}, "data": {i}}},\n'
+        if i == "$":
+            enter = ord("\n")
+            machine_code += f'{{"index": {str(index)}, "data": {enter}}},\n'
+        else:
+            machine_code += f'{{"index": {str(index)}, "data": {ord(i)}}},\n'
         index += 1
-    enter = ord("\n")
-    machine_code += f'{{"index": {str(index)}, "data": {enter}}},\n'
     machine_code += f'{{"index": {str(index + 1)}, "data": {0}'
 
     return machine_code, index

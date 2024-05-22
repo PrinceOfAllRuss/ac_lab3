@@ -69,6 +69,7 @@ class In(Operation):
                 control_unit.tick()
                 control_unit.data_path.inc_address()
                 control_unit.tick()
+            control_unit.conditional_jump_buffer = -1
             control_unit.data_path.set_address(addr)
             control_unit.tick()
         else:
