@@ -1,14 +1,11 @@
 class DataPath:
-    def __init__(self, memory):
+    def __init__(self, memory: [], input_data: []):
         self.memory = memory
         self.address = 0
         self.acc = 0
-        self.port_latch = -1
         self.line_break_latch = -1
-        self.alu = "+"
+        self.buffer = [input_data, []]
 
-    def set_alu(self, operation):
-        self.alu = operation
     def set_address(self, addr):
         self.address = addr
     def set_line_break(self, line_break):
@@ -20,11 +17,26 @@ class DataPath:
     def read_value(self):
         self.acc = self.memory[self.address]
         return self.acc
-    def write_value(self, value):
-        self.memory[self.address] = value
-    def out_acc(self, translation_status):
-        if self.port_latch == 0:
-            self.mux_for_output(translation_status)
+    def write_value_to_memory(self, sel, operation, port):
+        if sel == -1:
+            self.memory[self.address] = ord(self.buffer[port].pop())
+        elif sel == 0:
+            self.memory[self.address] = self.perform_alu_operation(operation)
+        elif sel == 1:
+            self.memory[self.address] = self.acc
+        return self.memory[self.address]
+    def write_value_to_acc(self, sel, operation, port):
+        if sel == -1:
+            self.acc = ord(self.buffer[port].pop())
+        elif sel == 0:
+            self.acc = self.perform_alu_operation(operation)
+        elif sel == 1:
+            self.acc = self.memory[self.address]
+    def out_acc(self, translation_status, port):
+        if translation_status:
+            self.buffer[port].append(str(chr(self.acc)))
+        else:
+            self.buffer[port].append(str(self.acc))
     def data_address(self, addr, inc, dec):
         if inc:
             return addr + 1
@@ -32,24 +44,11 @@ class DataPath:
             return addr - 1
         else:
             addr
-    def perform_alu_operation(self):
+    def perform_alu_operation(self, operation):
         value_1 = self.memory[self.address]
         value_2 = self.acc
-        if self.alu == "+":
-            self.acc = value_1 + value_2
+        if operation == "+":
+            return value_1 + value_2
         else:
             print("Now it doesn't work")
-    def write_value_to_memory_from_acc(self):
-        self.memory[self.address] = self.acc
-    def set_port_latch(self, port):
-        self.port_latch = port
-    def mux_for_output(self, translation_status):
-        if translation_status:
-            self.mux_for_str_output()
-        else:
-            print(self.acc)
-    def mux_for_str_output(self):
-        if self.line_break_latch == -1:
-            print(chr(self.acc), end="")
-        else:
-            print(chr(self.acc))
+            return 0

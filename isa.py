@@ -1,20 +1,13 @@
-# from control_unit import ControlUnit
 class Operation():
     def __init__(self, name = "", args = []):
         self.name = name
         self.args = args
-    def get_address(self, index):
-        address = self.args[index]
-        address_index = int(address[1:])
-        return address_index
-    # def perform(self, control_unit: ControlUnit):
-    #     return
     def perform(self, control_unit):
         return
 class Mov(Operation):
     def perform(self, control_unit):
         if len(self.args) == 1:
-            control_unit.data_path.set_address(self.get_address(0))
+            control_unit.data_path.set_address(self.args[0])
             control_unit.tick()
         else:
             """
@@ -22,27 +15,24 @@ class Mov(Operation):
             """
             # control_unit.data_path.set_address(self)
             # control_unit.tick()
-        control_unit.mux_for_address(None)
+        control_unit.select_address(None)
 class Jmp(Operation):
     def perform(self, control_unit):
-        next_operation_address = self.get_address(0)
-        control_unit.mux_for_address(next_operation_address)
+        next_operation_address = self.args[0]
+        control_unit.select_address(next_operation_address)
 class Jz(Operation):
     def perform(self, control_unit):
         if control_unit.conditional_jump_buffer == 0:
-            next_operation_address = self.get_address(0)
-            control_unit.mux_for_address(next_operation_address)
+            next_operation_address = self.args[0]
+            control_unit.select_address(next_operation_address)
             control_unit.conditional_jump_buffer = -1
             control_unit.tick()
         else:
-            control_unit.mux_for_address(None)
+            control_unit.select_address(None)
 
 class Add(Operation):
     def perform(self, control_unit):
-        control_unit.data_path.set_alu("+")
-        control_unit.tick()
-
-        first_address = self.get_address(0)
+        first_address = self.args[0]
         control_unit.data_path.set_address(first_address)
         control_unit.tick()
 
@@ -50,78 +40,71 @@ class Add(Operation):
         control_unit.tick()
 
         for i in range(1, len(self.args) - 1):
-            adds = self.get_address(i)
+            adds = self.args[i]
             control_unit.data_path.set_address(adds)
             control_unit.tick()
 
-            control_unit.data_path.perform_alu_operation()
+            control_unit.data_path.write_value_to_acc(0, "+", None)
             control_unit.tick()
 
         last_address = self.args[-1]
         control_unit.data_path.set_address(last_address)
         control_unit.tick()
 
-        control_unit.data_path.write_value_to_memory_from_acc()
+        control_unit.data_path.write_value_to_memory(1, "+", None)
         control_unit.tick()
 
-        control_unit.mux_for_address(None)
+        control_unit.select_address(None)
 class In(Operation):
     def perform(self, control_unit):
-        adds = self.args[-1]
-        control_unit.data_path.set_address(adds)
-        control_unit.tick()
 
-        value = input()
-        for i in value:
-            control_unit.data_path.write_value(ord(i))
+        if len(self.args) == 2:
+            addr = self.args[1]
+            control_unit.data_path.set_address(addr)
+            port = self.args[0]
+            control_unit.out_condition = 1
+
+            while control_unit.conditional_jump_buffer != 0:
+                control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_memory(-1, None, port)
+                control_unit.tick()
+                control_unit.data_path.inc_address()
+                control_unit.tick()
+            control_unit.data_path.set_address(addr)
             control_unit.tick()
-            control_unit.data_path.inc_address()
+        else:
+            port = self.args[0]
+            control_unit.out_condition = 0
+            control_unit.data_path.write_value_to_acc(-1, None, port)
             control_unit.tick()
 
-        control_unit.data_path.write_value(ord("\n"))
-        control_unit.tick()
-        control_unit.data_path.inc_address()
-        control_unit.tick()
-        control_unit.data_path.write_value(ord("\0"))
-        control_unit.tick()
-        control_unit.data_path.set_address(adds)
-        control_unit.tick()
-
-        control_unit.mux_for_address(None)
+        control_unit.select_address(None)
 class Out(Operation):
     def perform(self, control_unit):
         port = self.args[0]
-        type = self.args[-1]
+        el_type = self.args[-1]
 
-        # if len(self.args) == 3:
-        #     addr = self.args[1]
-        #     control_unit.data_path.set_address(addr)
-        #     control_unit.tick()
-
-        if type == "numb":
-            control_unit.data_path.set_port_latch(port)
-            control_unit.tick()
-
-            control_unit.data_path.read_value()
-            control_unit.tick()
-
-            control_unit.data_path.out_acc(False)
-            control_unit.tick()
-        elif type == "str":
-            control_unit.data_path.set_port_latch(port)
-            control_unit.tick()
-
-            control_unit.conditional_jump_buffer = control_unit.data_path.read_value()
-            control_unit.tick()
-
-            if control_unit.conditional_jump_buffer != 0:
-                control_unit.data_path.out_acc(True)
+        if el_type == "numb":
+            if control_unit.out_condition == 0:
+                control_unit.data_path.out_acc(False, port)
                 control_unit.tick()
-
-                control_unit.data_path.inc_address()
+            elif control_unit.out_condition == 1:
+                control_unit.data_path.read_value()
                 control_unit.tick()
-
-        control_unit.mux_for_address(None)
+                control_unit.data_path.out_acc(False, port)
+                control_unit.tick()
+        elif el_type == "str":
+            if control_unit.out_condition == 0:
+                control_unit.data_path.out_acc(True, port)
+                control_unit.tick()
+            elif control_unit.out_condition == 1:
+                control_unit.conditional_jump_buffer = control_unit.data_path.read_value()
+                control_unit.tick()
+                if control_unit.conditional_jump_buffer != 0:
+                    control_unit.data_path.out_acc(True, port)
+                    control_unit.tick()
+                    control_unit.data_path.inc_address()
+                    control_unit.tick()
+        control_unit.select_address(None)
 class Halt(Operation):
     def perform(self, control_unit):
         print("End of program by HALT")
