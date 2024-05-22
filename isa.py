@@ -74,7 +74,7 @@ class In(Operation):
         else:
             port = self.args[0]
             control_unit.out_condition = 0
-            control_unit.data_path.write_value_to_acc(-1, None, port)
+            control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(-1, None, port)
             control_unit.tick()
 
         control_unit.select_address(None)
@@ -85,16 +85,21 @@ class Out(Operation):
 
         if el_type == "numb":
             if control_unit.out_condition == 0:
-                control_unit.data_path.out_acc(False, port)
+                if control_unit.conditional_jump_buffer != 0:
+                    control_unit.data_path.out_acc(False, port)
+                control_unit.out_condition = 1
                 control_unit.tick()
             elif control_unit.out_condition == 1:
-                control_unit.data_path.read_value()
+                control_unit.conditional_jump_buffer = control_unit.data_path.read_value()
                 control_unit.tick()
-                control_unit.data_path.out_acc(False, port)
-                control_unit.tick()
+                if control_unit.conditional_jump_buffer != 0:
+                    control_unit.data_path.out_acc(False, port)
+                    control_unit.tick()
         elif el_type == "str":
             if control_unit.out_condition == 0:
-                control_unit.data_path.out_acc(True, port)
+                if control_unit.conditional_jump_buffer != 0:
+                    control_unit.data_path.out_acc(True, port)
+                control_unit.out_condition = 1
                 control_unit.tick()
             elif control_unit.out_condition == 1:
                 control_unit.conditional_jump_buffer = control_unit.data_path.read_value()

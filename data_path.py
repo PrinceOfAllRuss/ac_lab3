@@ -32,11 +32,14 @@ class DataPath:
             self.acc = self.perform_alu_operation(operation)
         elif sel == 1:
             self.acc = self.memory[self.address]
+        return self.acc
     def out_acc(self, translation_status, port):
         if translation_status:
             self.buffer[port].append(str(chr(self.acc)))
+            return self.acc
         else:
             self.buffer[port].append(str(self.acc))
+            return self.acc
     def data_address(self, addr, inc, dec):
         if inc:
             return addr + 1
