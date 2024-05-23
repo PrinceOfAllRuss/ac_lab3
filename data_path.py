@@ -49,15 +49,25 @@ class DataPath:
         value_2 = self.memory[self.address]
         if operation == "+":
             return value_1 + value_2
+        elif operation == "-":
+            return value_1 - value_2
+        elif operation == "*":
+            return value_1 * value_2
+        elif operation == "/":
+            return value_1 / value_2
         elif operation == "%":
             return value_1 % value_2
-        elif operation == "==":
-            if value_1 == value_2:
-                return 1
-            else:
+        elif operation == "<" or operation == "==" or operation == ">":
+            if value_1 < value_2:
+                return -1
+            elif value_1 == value_2:
                 return 0
+            elif value_1 > value_2:
+                return 1
         elif operation == "inc":
             return value_1 + 1
+        elif operation == "dec":
+            return value_1 - 1
         else:
             print("Now it doesn't work")
             return 0

@@ -45,6 +45,15 @@ class Inc(Operation):
         control_unit.data_path.write_value_to_memory(0, "inc", None)
         control_unit.tick()
         control_unit.select_address(None)
+class Dec(Operation):
+    def perform(self, control_unit):
+        control_unit.data_path.set_address(self.args[0])
+        control_unit.tick()
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_memory(0, "dec", None)
+        control_unit.tick()
+        control_unit.select_address(None)
 class Jmp(Operation):
     def perform(self, control_unit):
         next_operation_address = self.args[0]
@@ -60,10 +69,28 @@ class Jz(Operation):
             control_unit.select_address(None)
 class Je(Operation):
     def perform(self, control_unit):
+        if control_unit.je_condition == 0:
+            next_operation_address = self.args[0]
+            control_unit.select_address(next_operation_address)
+            control_unit.je_condition = None
+            control_unit.tick()
+        else:
+            control_unit.select_address(None)
+class Jb(Operation):
+    def perform(self, control_unit):
         if control_unit.je_condition == 1:
             next_operation_address = self.args[0]
             control_unit.select_address(next_operation_address)
-            control_unit.je_condition = 0
+            control_unit.je_condition = None
+            control_unit.tick()
+        else:
+            control_unit.select_address(None)
+class Jl(Operation):
+    def perform(self, control_unit):
+        if control_unit.je_condition == -1:
+            next_operation_address = self.args[0]
+            control_unit.select_address(next_operation_address)
+            control_unit.je_condition = None
             control_unit.tick()
         else:
             control_unit.select_address(None)
@@ -102,7 +129,82 @@ class Add(Operation):
         control_unit.data_path.set_address(last_address)
         control_unit.tick()
 
-        control_unit.data_path.write_value_to_memory(1, "+", None)
+        control_unit.data_path.write_value_to_memory(1, None, None)
+        control_unit.tick()
+
+        control_unit.select_address(None)
+class Sub(Operation):
+    def perform(self, control_unit):
+        first_address = self.args[0]
+        control_unit.data_path.set_address(first_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+
+        for i in range(1, len(self.args) - 1):
+            adds = self.args[i]
+            control_unit.data_path.set_address(adds)
+            control_unit.tick()
+
+            control_unit.data_path.write_value_to_acc(0, "-", None)
+            control_unit.tick()
+
+        last_address = self.args[-1]
+        control_unit.data_path.set_address(last_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_memory(1, None, None)
+        control_unit.tick()
+
+        control_unit.select_address(None)
+class Mul(Operation):
+    def perform(self, control_unit):
+        first_address = self.args[0]
+        control_unit.data_path.set_address(first_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+
+        for i in range(1, len(self.args) - 1):
+            adds = self.args[i]
+            control_unit.data_path.set_address(adds)
+            control_unit.tick()
+
+            control_unit.data_path.write_value_to_acc(0, "*", None)
+            control_unit.tick()
+
+        last_address = self.args[-1]
+        control_unit.data_path.set_address(last_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_memory(1, None, None)
+        control_unit.tick()
+
+        control_unit.select_address(None)
+class Div(Operation):
+    def perform(self, control_unit):
+        first_address = self.args[0]
+        control_unit.data_path.set_address(first_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+
+        for i in range(1, len(self.args) - 1):
+            adds = self.args[i]
+            control_unit.data_path.set_address(adds)
+            control_unit.tick()
+
+            control_unit.data_path.write_value_to_acc(0, "/", None)
+            control_unit.tick()
+
+        last_address = self.args[-1]
+        control_unit.data_path.set_address(last_address)
+        control_unit.tick()
+
+        control_unit.data_path.write_value_to_memory(1, None, None)
         control_unit.tick()
 
         control_unit.select_address(None)
@@ -188,5 +290,10 @@ class Halt(Operation):
         print("End of program by HALT")
         control_unit.program_end_condition = True
 
-opcode = {"mov": Mov(), "inc": Inc(), "add": Add(), "rmd": Rmd(), "jmp": Jmp(), "jz": Jz(), "je": Je(), "cmp": Cmp(), "in": In(), "out": Out(), "halt": Halt()}
-opcode_keys = ["mov", "inc", "dec", "add", "sub", "mul", "div", "rmd", "jmp", "jz", "je", "cmp", "in", "out", "halt"]
+opcode = {"mov": Mov(), "inc": Inc(), "dec": Dec(), "add": Add(),
+          "sub": Sub(), "mul": Mul(), "div": Div(), "rmd": Rmd(),
+          "jmp": Jmp(), "jz": Jz(), "je": Je(), "jb": Jb(), "jl": Jl(),
+          "cmp": Cmp(), "in": In(), "out": Out(), "halt": Halt()}
+opcode_keys = ["mov", "inc", "dec", "add", "sub",
+               "mul", "div", "rmd", "jmp", "jz",
+               "je", "jb", "jl", "cmp", "in", "out", "halt"]
