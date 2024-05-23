@@ -14,9 +14,6 @@ class DataPath:
         self.address += 1
     def dec_address(self):
         self.address -= 1
-    def read_value(self):
-        self.acc = self.memory[self.address]
-        return self.acc
     def write_value_to_memory(self, sel, operation, port):
         if sel == -1:
             self.memory[self.address] = ord(self.buffer[port].pop())
@@ -48,10 +45,19 @@ class DataPath:
         else:
             addr
     def perform_alu_operation(self, operation):
-        value_1 = self.memory[self.address]
-        value_2 = self.acc
+        value_1 = self.acc
+        value_2 = self.memory[self.address]
         if operation == "+":
             return value_1 + value_2
+        elif operation == "%":
+            return value_1 % value_2
+        elif operation == "==":
+            if value_1 == value_2:
+                return 1
+            else:
+                return 0
+        elif operation == "inc":
+            return value_1 + 1
         else:
             print("Now it doesn't work")
             return 0

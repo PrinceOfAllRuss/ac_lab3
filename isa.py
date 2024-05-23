@@ -9,12 +9,41 @@ class Mov(Operation):
         if len(self.args) == 1:
             control_unit.data_path.set_address(self.args[0])
             control_unit.tick()
-        else:
-            """
-            Тут должна быть обработка перемещения элемента из одной ячейкм памяти в другую
-            """
-            # control_unit.data_path.set_address(self)
-            # control_unit.tick()
+        elif len(self.args) == 3:
+            control_unit.data_path.set_address(self.args[0])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_acc(1, None, None)
+            control_unit.tick()
+            control_unit.data_path.set_address(self.args[-1])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_memory(1, None, None)
+            control_unit.tick()
+            control_unit.data_path.set_address(self.args[1])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_acc(1, None, None)
+            control_unit.tick()
+            control_unit.data_path.set_address(self.args[0])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_memory(1, None, None)
+            control_unit.tick()
+            control_unit.data_path.set_address(self.args[-1])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_acc(1, None, None)
+            control_unit.tick()
+            control_unit.data_path.set_address(self.args[1])
+            control_unit.tick()
+            control_unit.data_path.write_value_to_memory(1, None, None)
+            control_unit.tick()
+
+        control_unit.select_address(None)
+class Inc(Operation):
+    def perform(self, control_unit):
+        control_unit.data_path.set_address(self.args[0])
+        control_unit.tick()
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_memory(0, "inc", None)
+        control_unit.tick()
         control_unit.select_address(None)
 class Jmp(Operation):
     def perform(self, control_unit):
@@ -29,14 +58,36 @@ class Jz(Operation):
             control_unit.tick()
         else:
             control_unit.select_address(None)
+class Je(Operation):
+    def perform(self, control_unit):
+        if control_unit.je_condition == 1:
+            next_operation_address = self.args[0]
+            control_unit.select_address(next_operation_address)
+            control_unit.je_condition = 0
+            control_unit.tick()
+        else:
+            control_unit.select_address(None)
+class Cmp(Operation):
+    def perform(self, control_unit):
+        first_address = self.args[0]
+        control_unit.data_path.set_address(first_address)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
 
+        adds = self.args[1]
+        control_unit.data_path.set_address(adds)
+        control_unit.tick()
+        control_unit.je_condition = control_unit.data_path.write_value_to_acc(0, "==", None)
+        control_unit.tick()
+        control_unit.select_address(None)
 class Add(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
         control_unit.data_path.set_address(first_address)
         control_unit.tick()
 
-        control_unit.data_path.read_value()
+        control_unit.data_path.write_value_to_acc(1, None, None)
         control_unit.tick()
 
         for i in range(1, len(self.args) - 1):
@@ -52,6 +103,27 @@ class Add(Operation):
         control_unit.tick()
 
         control_unit.data_path.write_value_to_memory(1, "+", None)
+        control_unit.tick()
+
+        control_unit.select_address(None)
+class Rmd(Operation):
+    def perform(self, control_unit):
+        first_address = self.args[0]
+        control_unit.data_path.set_address(first_address)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_acc(1, None, None)
+        control_unit.tick()
+
+        adds = self.args[1]
+        control_unit.data_path.set_address(adds)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_acc(0, "%", None)
+        control_unit.tick()
+
+        last_address = self.args[-1]
+        control_unit.data_path.set_address(last_address)
+        control_unit.tick()
+        control_unit.data_path.write_value_to_memory(1, None, None)
         control_unit.tick()
 
         control_unit.select_address(None)
@@ -91,7 +163,7 @@ class Out(Operation):
                 control_unit.out_condition = 1
                 control_unit.tick()
             elif control_unit.out_condition == 1:
-                control_unit.conditional_jump_buffer = control_unit.data_path.read_value()
+                control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(1, None, None)
                 control_unit.tick()
                 if control_unit.conditional_jump_buffer != 0:
                     control_unit.data_path.out_acc(False, port)
@@ -103,7 +175,7 @@ class Out(Operation):
                 control_unit.out_condition = 1
                 control_unit.tick()
             elif control_unit.out_condition == 1:
-                control_unit.conditional_jump_buffer = control_unit.data_path.read_value()
+                control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(1, None, None)
                 control_unit.tick()
                 if control_unit.conditional_jump_buffer != 0:
                     control_unit.data_path.out_acc(True, port)
@@ -116,5 +188,5 @@ class Halt(Operation):
         print("End of program by HALT")
         control_unit.program_end_condition = True
 
-opcode = {"mov": Mov(), "add": Add(), "jmp": Jmp(), "jz": Jz(), "in": In(), "out": Out(), "halt": Halt()}
-opcode_keys = ["mov", "inc", "dec", "add", "sub", "mul", "div", "jmp", "jz", "jnz", "cmp", "in", "out", "halt"]
+opcode = {"mov": Mov(), "inc": Inc(), "add": Add(), "rmd": Rmd(), "jmp": Jmp(), "jz": Jz(), "je": Je(), "cmp": Cmp(), "in": In(), "out": Out(), "halt": Halt()}
+opcode_keys = ["mov", "inc", "dec", "add", "sub", "mul", "div", "rmd", "jmp", "jz", "je", "cmp", "in", "out", "halt"]

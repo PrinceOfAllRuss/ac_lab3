@@ -37,26 +37,31 @@ def from_language_to_machine_code(program: str):
                         machine_code += "},\n"
                         break
                     elif data[j + 1] in opcode_keys:
-                        machine_code += "}, "
+                        machine_code += "},\n"
                         index += 1
                     else:
-                        machine_code += ', "arg": ['
+                        if data[j] not in ["halt"]:
+                            machine_code += ', "arg": ['
+                        else:
+                            machine_code += "},\n"
+                            index += 1
                 elif ":" in data[j]:
                     labels[data[j][:-1]] = index
                 else:
                     new_el = re.sub(r',', '', data[j])
-                    if "@" in new_el:
-                        machine_code += f'{new_el}'
-                    elif re.search(r'[a-zA-Z]', new_el) is None:
+                    if re.search(r'[a-zA-Z]', new_el) is None:
                         machine_code += f'{new_el}'
                     else:
                         machine_code += f'"{new_el}"'
 
-                    if data[j + 1] in opcode_keys or ":" in data[j + 1]:
+                    if j == len(data) - 1:
                         machine_code += "]},\n"
-                        index += 1
                     else:
-                        machine_code += ", "
+                        if data[j + 1] in opcode_keys or ":" in data[j + 1]:
+                            machine_code += "]},\n"
+                            index += 1
+                        else:
+                            machine_code += ", "
             break
 
     # Записываем все данные
@@ -109,7 +114,7 @@ def from_language_to_machine_code(program: str):
     f.close()
 
     # print(data)
-    print(machine_code)
+    # print(machine_code)
 
 def from_machine_code_to_memory(machine_code, memory_size):
     machine_array = json.loads(machine_code)
