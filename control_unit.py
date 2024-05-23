@@ -1,3 +1,4 @@
+import logging
 from data_path import DataPath
 from isa import Operation, opcode, opcode_keys
 
@@ -17,15 +18,17 @@ class ControlUnit:
         self.tick_counter += 1
 
     def select_address(self, next):
-        self.program_counter += 1
         if next is None:
             self.address += 1
         else:
             self.address = next
     def start(self):
-        self.program_counter = 1
+        self.program_counter = 0
         while not self.program_end_condition:
             operation: Operation = self.memory[self.address]
+            logging.debug(f'PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} '
+                          f'MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} '
+                          f'COMMAND: {operation.name} {operation.args}')
             if operation.name in opcode_keys:
                 callable_operation: Operation = opcode[operation.name]
                 callable_operation.name = operation.name
