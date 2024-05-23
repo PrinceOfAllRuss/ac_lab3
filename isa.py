@@ -1,3 +1,7 @@
+import logging
+import re
+
+
 class Operation():
     def __init__(self, name = "", args = []):
         self.name = name
@@ -240,6 +244,11 @@ class In(Operation):
 
             while control_unit.conditional_jump_buffer != 0:
                 control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_memory(-1, None, port)
+                if control_unit.conditional_jump_buffer == 10:
+                    enter = "\\n"
+                    logging.debug(f'input: "{enter}"')
+                elif control_unit.conditional_jump_buffer != 0:
+                    logging.debug(f'input: "{chr(control_unit.conditional_jump_buffer)}"')
                 control_unit.tick()
                 control_unit.data_path.inc_address()
                 control_unit.tick()
@@ -250,6 +259,7 @@ class In(Operation):
             port = self.args[0]
             control_unit.out_condition = 0
             control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(-1, None, port)
+            logging.debug(f'input: "{chr(control_unit.conditional_jump_buffer)}"')
             control_unit.tick()
 
         control_unit.select_address(None)
@@ -257,10 +267,12 @@ class Out(Operation):
     def perform(self, control_unit):
         port = self.args[0]
         el_type = self.args[-1]
+        output = "".join(control_unit.data_path.buffer[1]).replace("\n", "\\n")
 
         if el_type == "numb":
             if control_unit.out_condition == 0:
                 if control_unit.conditional_jump_buffer != 0:
+                    logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
                     control_unit.data_path.out_acc(False, port)
                 control_unit.out_condition = 1
                 control_unit.tick()
@@ -268,11 +280,17 @@ class Out(Operation):
                 control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(1, None, None)
                 control_unit.tick()
                 if control_unit.conditional_jump_buffer != 0:
+                    logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
                     control_unit.data_path.out_acc(False, port)
                     control_unit.tick()
         elif el_type == "str":
             if control_unit.out_condition == 0:
                 if control_unit.conditional_jump_buffer != 0:
+                    if control_unit.conditional_jump_buffer == 10:
+                        enter = "\\n"
+                        logging.debug(f'out: "{output}" << "{enter}"')
+                    else:
+                        logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
                     control_unit.data_path.out_acc(True, port)
                 control_unit.out_condition = 1
                 control_unit.tick()
@@ -280,6 +298,11 @@ class Out(Operation):
                 control_unit.conditional_jump_buffer = control_unit.data_path.write_value_to_acc(1, None, None)
                 control_unit.tick()
                 if control_unit.conditional_jump_buffer != 0:
+                    if control_unit.conditional_jump_buffer == 10:
+                        enter = "\\n"
+                        logging.debug(f'out: "{output}" << "{enter}"')
+                    else:
+                        logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
                     control_unit.data_path.out_acc(True, port)
                     control_unit.tick()
                     control_unit.data_path.inc_address()
