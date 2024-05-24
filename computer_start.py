@@ -7,7 +7,7 @@ from translator import from_language_to_machine_code, from_machine_code_to_memor
 if __name__ == '__main__':
     # file_name = input()
     # f = open(file_name, 'r')
-    f = open('tests/test_2.txt', 'r')
+    f = open('tests/hello.txt', 'r')
     program = f.read()
     from_language_to_machine_code(program)
     f.close()
