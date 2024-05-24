@@ -4,11 +4,6 @@ from isa import opcode_keys, Operation
 
 def write_str_to_memory(str_data, machine_code, index):
     for i in str_data:
-        # if i == "$":
-        #     enter = "\n"
-        #     machine_code += f'{{"index": {str(index)}, "data": {enter}}},\n'
-        # else:
-        #     machine_code += f'{{"index": {str(index)}, "data": {i}}},\n'
         if i == "$":
             enter = ord("\n")
             machine_code += f'{{"index": {str(index)}, "data": {enter}}},\n'

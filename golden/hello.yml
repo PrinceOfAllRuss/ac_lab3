@@ -1,0 +1,86 @@
+in_source: |-
+  .data:
+    message "Hello world"
+  .code:
+    mov message
+    loop:
+        jz break
+        out 1 str
+        jmp loop
+    break:
+        halt
+in_stdin: |-
+  Fedor
+out_code: |
+  JP 2
+  MEM 2147483653
+  LD 1
+  OUT 0
+  HLT
+  MEM 11
+  MEM 72
+  MEM 101
+  MEM 108
+  MEM 108
+  MEM 111
+  MEM 32
+  MEM 119
+  MEM 111
+  MEM 114
+  MEM 108
+  MEM 100
+out_stdout: |
+  Something
+  ============================================================
+  Hello world
+out_log: |
+  DEBUG:root:PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: mov [5]
+  DEBUG:root:PC: 1 TICK: 2 P_ADDR: 1 MEM_ADDR: 5 ACC: 0 COMMAND: jz [4]
+  DEBUG:root:PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 5 ACC: 0 COMMAND: out [1, 'str']
+  DEBUG:root:out: "" << "H"
+  DEBUG:root:PC: 3 TICK: 7 P_ADDR: 3 MEM_ADDR: 6 ACC: 72 COMMAND: jmp [1]
+  DEBUG:root:PC: 4 TICK: 8 P_ADDR: 1 MEM_ADDR: 6 ACC: 72 COMMAND: jz [4]
+  DEBUG:root:PC: 5 TICK: 9 P_ADDR: 2 MEM_ADDR: 6 ACC: 72 COMMAND: out [1, 'str']
+  DEBUG:root:out: "H" << "e"
+  DEBUG:root:PC: 6 TICK: 13 P_ADDR: 3 MEM_ADDR: 7 ACC: 101 COMMAND: jmp [1]
+  DEBUG:root:PC: 7 TICK: 14 P_ADDR: 1 MEM_ADDR: 7 ACC: 101 COMMAND: jz [4]
+  DEBUG:root:PC: 8 TICK: 15 P_ADDR: 2 MEM_ADDR: 7 ACC: 101 COMMAND: out [1, 'str']
+  DEBUG:root:out: "He" << "l"
+  DEBUG:root:PC: 9 TICK: 19 P_ADDR: 3 MEM_ADDR: 8 ACC: 108 COMMAND: jmp [1]
+  DEBUG:root:PC: 10 TICK: 20 P_ADDR: 1 MEM_ADDR: 8 ACC: 108 COMMAND: jz [4]
+  DEBUG:root:PC: 11 TICK: 21 P_ADDR: 2 MEM_ADDR: 8 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hel" << "l"
+  DEBUG:root:PC: 12 TICK: 25 P_ADDR: 3 MEM_ADDR: 9 ACC: 108 COMMAND: jmp [1]
+  DEBUG:root:PC: 13 TICK: 26 P_ADDR: 1 MEM_ADDR: 9 ACC: 108 COMMAND: jz [4]
+  DEBUG:root:PC: 14 TICK: 27 P_ADDR: 2 MEM_ADDR: 9 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hell" << "o"
+  DEBUG:root:PC: 15 TICK: 31 P_ADDR: 3 MEM_ADDR: 10 ACC: 111 COMMAND: jmp [1]
+  DEBUG:root:PC: 16 TICK: 32 P_ADDR: 1 MEM_ADDR: 10 ACC: 111 COMMAND: jz [4]
+  DEBUG:root:PC: 17 TICK: 33 P_ADDR: 2 MEM_ADDR: 10 ACC: 111 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello" << " "
+  DEBUG:root:PC: 18 TICK: 37 P_ADDR: 3 MEM_ADDR: 11 ACC: 32 COMMAND: jmp [1]
+  DEBUG:root:PC: 19 TICK: 38 P_ADDR: 1 MEM_ADDR: 11 ACC: 32 COMMAND: jz [4]
+  DEBUG:root:PC: 20 TICK: 39 P_ADDR: 2 MEM_ADDR: 11 ACC: 32 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello " << "w"
+  DEBUG:root:PC: 21 TICK: 43 P_ADDR: 3 MEM_ADDR: 12 ACC: 119 COMMAND: jmp [1]
+  DEBUG:root:PC: 22 TICK: 44 P_ADDR: 1 MEM_ADDR: 12 ACC: 119 COMMAND: jz [4]
+  DEBUG:root:PC: 23 TICK: 45 P_ADDR: 2 MEM_ADDR: 12 ACC: 119 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello w" << "o"
+  DEBUG:root:PC: 24 TICK: 49 P_ADDR: 3 MEM_ADDR: 13 ACC: 111 COMMAND: jmp [1]
+  DEBUG:root:PC: 25 TICK: 50 P_ADDR: 1 MEM_ADDR: 13 ACC: 111 COMMAND: jz [4]
+  DEBUG:root:PC: 26 TICK: 51 P_ADDR: 2 MEM_ADDR: 13 ACC: 111 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello wo" << "r"
+  DEBUG:root:PC: 27 TICK: 55 P_ADDR: 3 MEM_ADDR: 14 ACC: 114 COMMAND: jmp [1]
+  DEBUG:root:PC: 28 TICK: 56 P_ADDR: 1 MEM_ADDR: 14 ACC: 114 COMMAND: jz [4]
+  DEBUG:root:PC: 29 TICK: 57 P_ADDR: 2 MEM_ADDR: 14 ACC: 114 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello wor" << "l"
+  DEBUG:root:PC: 30 TICK: 61 P_ADDR: 3 MEM_ADDR: 15 ACC: 108 COMMAND: jmp [1]
+  DEBUG:root:PC: 31 TICK: 62 P_ADDR: 1 MEM_ADDR: 15 ACC: 108 COMMAND: jz [4]
+  DEBUG:root:PC: 32 TICK: 63 P_ADDR: 2 MEM_ADDR: 15 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG:root:out: "Hello worl" << "d"
+  DEBUG:root:PC: 33 TICK: 67 P_ADDR: 3 MEM_ADDR: 16 ACC: 100 COMMAND: jmp [1]
+  DEBUG:root:PC: 34 TICK: 68 P_ADDR: 1 MEM_ADDR: 16 ACC: 100 COMMAND: jz [4]
+  DEBUG:root:PC: 35 TICK: 69 P_ADDR: 2 MEM_ADDR: 16 ACC: 100 COMMAND: out [1, 'str']
+  DEBUG:root:PC: 36 TICK: 71 P_ADDR: 3 MEM_ADDR: 16 ACC: 0 COMMAND: jmp [1]
+  DEBUG:root:PC: 37 TICK: 72 P_ADDR: 1 MEM_ADDR: 16 ACC: 0 COMMAND: jz [4]
+  DEBUG:root:PC: 38 TICK: 74 P_ADDR: 4 MEM_ADDR: 16 ACC: 0 COMMAND: halt []
