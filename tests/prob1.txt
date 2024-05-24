@@ -1,0 +1,28 @@
+.data:
+    i 1
+    sum 0
+    del_1 3
+    del_2 5
+    end 1000
+    correct_remainder 0
+    division_remainder 0
+.code:
+    loop:
+        cmp i, end
+        je break
+        rmd i, del_1, division_remainder
+        cmp division_remainder, correct_remainder
+        je increase_results
+        rmd i, del_2, division_remainder
+        cmp division_remainder, correct_remainder
+        je increase_results
+        inc i
+        jmp loop
+    increase_results:
+        add sum, i, sum
+        inc i
+        jmp loop
+    break:
+        mov sum
+        out 1 numb
+        halt

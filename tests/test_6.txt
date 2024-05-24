@@ -1,0 +1,32 @@
+.data:
+    el1 1
+    el2 2
+    e "Y$"
+    b "B$"
+    l "L$"
+.code:
+    cmp el1, el1
+    je equals
+    jb bigger
+    jl less
+    cmp el1, el2
+    je equals
+    jb bigger
+    jl less
+    cmp el2, el1
+    je equals
+    jb bigger
+    jl less
+    halt
+    equals:
+        mov e
+        out 1 str
+        jmp 4
+    bigger:
+        mov b
+        out 1 str
+        jmp 12
+    less:
+        mov l
+        out 1 str
+        jmp 8

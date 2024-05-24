@@ -1,0 +1,10 @@
+.data:
+    message "Hello world"
+.code:
+    mov message
+    loop:
+        jz break
+        out 1 str
+        jmp loop
+    break:
+        halt

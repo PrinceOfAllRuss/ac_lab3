@@ -1,0 +1,8 @@
+.code:
+    loop:
+        jz break
+        in 0
+        out 1 str
+        jmp loop
+    break:
+        halt

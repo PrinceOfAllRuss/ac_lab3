@@ -1,0 +1,16 @@
+.data:
+    el1 1
+    el2 2
+    good "Y$"
+.code:
+    cmp el1, el2
+    je yes
+    cmp el1, el1
+    je yes
+    rmd el1, el2, 22
+    rmd el1, el1, 23
+    halt
+    yes:
+        mov good
+        out 1 str
+        jmp 4
