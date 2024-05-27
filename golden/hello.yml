@@ -12,25 +12,25 @@ in_source: |-
 in_stdin: |-
   Fedor
 out_code: |
-  JP 2
-  MEM 2147483653
-  LD 1
-  OUT 0
-  HLT
-  MEM 11
-  MEM 72
-  MEM 101
-  MEM 108
-  MEM 108
-  MEM 111
-  MEM 32
-  MEM 119
-  MEM 111
-  MEM 114
-  MEM 108
-  MEM 100
+  [{"index": 0, "operation": "mov", "arg": [5]},
+  {"index": 1, "operation": "jz", "arg": [4]},
+  {"index": 2, "operation": "out", "arg": [1, "str"]},
+  {"index": 3, "operation": "jmp", "arg": [1]},
+  {"index": 4, "operation": "halt"},
+  {"index": 5, "data": 72},
+  {"index": 6, "data": 101},
+  {"index": 7, "data": 108},
+  {"index": 8, "data": 108},
+  {"index": 9, "data": 111},
+  {"index": 10, "data": 32},
+  {"index": 11, "data": 119},
+  {"index": 12, "data": 111},
+  {"index": 13, "data": 114},
+  {"index": 14, "data": 108},
+  {"index": 15, "data": 100},
+  {"index": 17, "data": 0}]
 out_stdout: |
-  Something
+  source LoC: 10 code instr: 4
   ============================================================
   Hello world
 out_log: |

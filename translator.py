@@ -1,6 +1,5 @@
-import json
 import re
-from isa import opcode_keys, Operation
+from isa import opcode_keys
 
 def write_str_to_memory(str_data, machine_code, index):
     for i in str_data:
@@ -15,6 +14,7 @@ def write_str_to_memory(str_data, machine_code, index):
     return machine_code, index
 
 def from_language_to_machine_code(program: str):
+    lines_of_code = len(program.split("\n"))
     program = re.sub("\s{4}", "", program)
     data = re.split("\s", program)
 
@@ -58,6 +58,8 @@ def from_language_to_machine_code(program: str):
                         else:
                             machine_code += ", "
             break
+
+    instr_count = index
 
     # Записываем все данные
     if data[0] == ".data:":
@@ -104,26 +106,18 @@ def from_language_to_machine_code(program: str):
     for i in all_labels:
         machine_code = re.sub(f'"{i}"', f'{labels[i]}', machine_code)
 
-    f = open("machine_code.txt", "w+")
-    f.write(machine_code)
+    print("source LoC:", lines_of_code, "code instr:", instr_count)
+    print("============================================================")
+
+    return machine_code
+
+def main(source, target):
+    f = open(source, 'r')
+    program = f.read()
     f.close()
 
-    # print(data)
-    # print(machine_code)
+    machine_code = from_language_to_machine_code(program)
 
-def from_machine_code_to_memory(machine_code, memory_size):
-    machine_array = json.loads(machine_code)
-    memory = [0] * memory_size
-    for i in range(len(machine_array)):
-        obj = machine_array[i]
-        keys = list(obj.keys())
-        index = obj["index"]
-        if keys[1] == "data":
-            memory[index] = obj["data"]
-        else:
-            if "arg" in keys:
-                operation = Operation(obj["operation"], obj["arg"])
-            else:
-                operation = Operation(obj["operation"], [])
-            memory[index] = operation
-    return memory
+    f = open(target, "w+")
+    f.write(machine_code)
+    f.close()

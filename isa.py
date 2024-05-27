@@ -1,6 +1,25 @@
+import json
 import logging
-import re
 
+def from_machine_code_to_memory(target, memory_size):
+    f = open(target, "r")
+    machine_code = f.read()
+    f.close()
+    machine_array = json.loads(machine_code)
+    memory = [0] * memory_size
+    for i in range(len(machine_array)):
+        obj = machine_array[i]
+        keys = list(obj.keys())
+        index = obj["index"]
+        if keys[1] == "data":
+            memory[index] = obj["data"]
+        else:
+            if "arg" in keys:
+                operation = Operation(obj["operation"], obj["arg"])
+            else:
+                operation = Operation(obj["operation"], [])
+            memory[index] = operation
+    return memory
 
 class Operation():
     def __init__(self, name = "", args = []):
@@ -259,7 +278,11 @@ class In(Operation):
             port = self.args[0]
             control_unit.out_condition = 0
             control_unit.jump_condition = control_unit.data_path.write_value_to_acc(-1, None, port)
-            logging.debug(f'input: "{chr(control_unit.jump_condition)}"')
+            if control_unit.jump_condition == 10:
+                enter = "\\n"
+                logging.debug(f'input: "{enter}"')
+            elif control_unit.jump_condition != 0:
+                logging.debug(f'input: "{chr(control_unit.jump_condition)}"')
             control_unit.tick()
 
         control_unit.select_address(None)
