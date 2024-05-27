@@ -1,5 +1,7 @@
 import logging
 import sys
+
+import translator
 from control_unit import ControlUnit
 from isa import from_machine_code_to_memory
 

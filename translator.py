@@ -15,9 +15,9 @@ def write_str_to_memory(str_data, machine_code, index):
 
 def from_language_to_machine_code(program: str):
     lines_of_code = len(program.split("\n"))
+    program = re.sub("\s*;\s*.*\s*\n", "\n", program)
     program = re.sub("\s{2}", "", program)
     data = re.split("\s", program)
-    # raise EOFError(program, data)
 
 
     labels = {}

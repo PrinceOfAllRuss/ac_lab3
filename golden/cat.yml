@@ -1,7 +1,7 @@
 in_source: |-
   .code:
     loop:
-        jz break
+        jz break    ; Комментарий
         in 0
         out 1 str
         jmp loop
