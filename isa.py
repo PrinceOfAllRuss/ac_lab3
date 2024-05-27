@@ -6,6 +6,8 @@ def from_machine_code_to_memory(target, memory_size):
     machine_code = f.read()
     f.close()
     machine_array = json.loads(machine_code)
+    if len(machine_array) > memory_size:
+        raise Exception("Memory Overflow")
     memory = [0] * memory_size
     for i in range(len(machine_array)):
         obj = machine_array[i]
