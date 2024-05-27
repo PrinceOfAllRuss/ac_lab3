@@ -1,12 +1,8 @@
 import logging
 import sys
 from control_unit import ControlUnit
-import translator
 from isa import from_machine_code_to_memory
 
-# def main(code_file, input_file):
-    # translator.main(code_file, "machine_code.txt")
-    # target = "machine_code.txt"
 def main(target, input_file):
     memory = from_machine_code_to_memory(target, 70)
 
@@ -32,5 +28,3 @@ if __name__ == '__main__':
     assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
     main(code_file, input_file)
-    # main("tests/additional_test_1.txt", "input_for_tests/input_for_test_hello_user.txt")
-    # main("machine_code.txt", "input_for_tests/input_for_test_cat.txt")

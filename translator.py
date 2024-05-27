@@ -15,8 +15,10 @@ def write_str_to_memory(str_data, machine_code, index):
 
 def from_language_to_machine_code(program: str):
     lines_of_code = len(program.split("\n"))
-    program = re.sub("\s{4}", "", program)
+    program = re.sub("\s{2}", "", program)
     data = re.split("\s", program)
+    # raise EOFError(program, data)
+
 
     labels = {}
     machine_code = "["
@@ -118,6 +120,5 @@ def main(source, target):
 
     machine_code = from_language_to_machine_code(program)
 
-    f = open(target, "w+")
-    f.write(machine_code)
-    f.close()
+    with open(target, "w", encoding="utf-8") as file:
+        file.write(machine_code)
