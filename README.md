@@ -178,7 +178,7 @@ comment ::= ";" <any symbols except "\n">
 
 ### DataPath
 
-<img src="">
+<img src="./scheme/data_path.png">
 
 Реализован в классе [DataPath](./data_path.py)
 
@@ -208,7 +208,7 @@ comment ::= ";" <any symbols except "\n">
 
 ### ControlUnit
 
-<img src="">
+<img src="./scheme/control_unit.png">
 
 Реализован в классе [ControlUnit](./control_unit.py)
 
@@ -252,6 +252,72 @@ comment ::= ";" <any symbols except "\n">
 Обновить конфигурацию golden tests:  `poetry run pytest . -v --update-goldens`
 
 CI при помощи Github Action:
+
+``` yaml
+name: Python CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Run tests and collect coverage
+        run: |
+          poetry run coverage run -m pytest .
+          poetry run coverage report -m
+        env:
+          CI: true
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Check code formatting with Ruff
+        run: poetry run ruff format --check .
+
+      - name: Run Ruff linters
+        run: poetry run ruff check .
+```
 
 Пример использования и журнал работы процессора на примере `cat`:
 
