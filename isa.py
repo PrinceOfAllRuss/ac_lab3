@@ -8,7 +8,7 @@ def from_machine_code_to_memory(target, memory_size):
     f.close()
     machine_array = json.loads(machine_code)
     if len(machine_array) > memory_size:
-        raise Exception("Memory Overflow")
+        raise OverflowError
     memory = [0] * memory_size
     for i in range(len(machine_array)):
         obj = machine_array[i]
@@ -296,44 +296,47 @@ class Out(Operation):
         output = "".join(control_unit.data_path.buffer[1]).replace("\n", "\\n")
 
         if el_type == "numb":
-            if control_unit.out_condition == 0:
-                if control_unit.jump_condition != 0:
-                    logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
-                    control_unit.data_path.out_acc(False, port)
-                control_unit.out_condition = 1
-                control_unit.tick()
-            elif control_unit.out_condition == 1:
-                control_unit.jump_condition = control_unit.data_path.write_value_to_acc(1, None, None)
-                control_unit.tick()
-                if control_unit.jump_condition != 0:
-                    logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
-                    control_unit.data_path.out_acc(False, port)
-                    control_unit.tick()
+            self.perform_for_numb(control_unit, output, port)
         elif el_type == "str":
-            if control_unit.out_condition == 0:
-                if control_unit.jump_condition != 0:
-                    if control_unit.jump_condition == 10:
-                        enter = "\\n"
-                        logging.debug(f'out: "{output}" << "{enter}"')
-                    else:
-                        logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
-                    control_unit.data_path.out_acc(True, port)
-                control_unit.out_condition = 1
-                control_unit.tick()
-            elif control_unit.out_condition == 1:
-                control_unit.jump_condition = control_unit.data_path.write_value_to_acc(1, None, None)
-                control_unit.tick()
-                if control_unit.jump_condition != 0:
-                    if control_unit.jump_condition == 10:
-                        enter = "\\n"
-                        logging.debug(f'out: "{output}" << "{enter}"')
-                    else:
-                        logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
-                    control_unit.data_path.out_acc(True, port)
-                    control_unit.tick()
-                    control_unit.data_path.inc_address()
-                    control_unit.tick()
+            self.perform_for_str(control_unit, output, port)
         control_unit.select_address(None)
+    def perform_for_numb(self, control_unit, output, port):
+        if control_unit.out_condition == 0:
+            if control_unit.jump_condition != 0:
+                logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
+                control_unit.data_path.out_acc(False, port)
+            control_unit.out_condition = 1
+            control_unit.tick()
+        elif control_unit.out_condition == 1:
+            control_unit.jump_condition = control_unit.data_path.write_value_to_acc(1, None, None)
+            control_unit.tick()
+            if control_unit.jump_condition != 0:
+                logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
+                control_unit.data_path.out_acc(False, port)
+                control_unit.tick()
+    def perform_for_str(self, control_unit, output, port):
+        if control_unit.out_condition == 0:
+            if control_unit.jump_condition != 0:
+                self.correct_out(output, control_unit)
+                control_unit.data_path.out_acc(True, port)
+            control_unit.out_condition = 1
+            control_unit.tick()
+        elif control_unit.out_condition == 1:
+            control_unit.jump_condition = control_unit.data_path.write_value_to_acc(1, None, None)
+            control_unit.tick()
+            if control_unit.jump_condition != 0:
+                self.correct_out(output, control_unit)
+                control_unit.data_path.out_acc(True, port)
+                control_unit.tick()
+                control_unit.data_path.inc_address()
+                control_unit.tick()
+    def correct_out(self, output, control_unit):
+        if control_unit.jump_condition == 10:
+            enter = "\\n"
+            logging.debug(f'out: "{output}" << "{enter}"')
+        else:
+            logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
+
 class Halt(Operation):
     def perform(self, control_unit):
         control_unit.program_end_condition = True

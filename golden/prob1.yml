@@ -9519,5 +9519,5 @@ out_log: |
   DEBUG   control_unit:start         PC: 9458 TICK: 36367 P_ADDR: 1 MEM_ADDR: 20 ACC: 0 COMMAND: je [13]
   DEBUG   control_unit:start         PC: 9459 TICK: 36369 P_ADDR: 13 MEM_ADDR: 20 ACC: 0 COMMAND: mov [17]
   DEBUG   control_unit:start         PC: 9460 TICK: 36371 P_ADDR: 14 MEM_ADDR: 17 ACC: 0 COMMAND: out [1, 'numb']
-  DEBUG   isa:perform       out: "" << "233168"
+  DEBUG   isa:perform_for_numb out: "" << "233168"
   DEBUG   control_unit:start         PC: 9461 TICK: 36374 P_ADDR: 15 MEM_ADDR: 17 ACC: 233168 COMMAND: halt []

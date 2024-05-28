@@ -19,11 +19,11 @@ class ControlUnit:
     def tick(self):
         self.tick_counter += 1
 
-    def select_address(self, next):
-        if next is None:
+    def select_address(self, next_addr):
+        if next_addr is None:
             self.address += 1
         else:
-            self.address = next
+            self.address = next_addr
     def start(self, limit):
         self.program_counter = 0
         try:

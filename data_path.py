@@ -30,41 +30,27 @@ class DataPath:
     def out_acc(self, translation_status, port):
         if translation_status:
             self.buffer[port].append(str(chr(self.acc)))
-            return self.acc
         else:
             self.buffer[port].append(str(self.acc))
-            return self.acc
+        return self.acc
     def data_address(self, addr, inc, dec):
+        new_addr = addr
         if inc:
-            return addr + 1
+            new_addr += 1
         elif dec:
-            return addr - 1
-        else:
-            addr
+            new_addr -= 1
+        return new_addr
     def perform_alu_operation(self, operation):
         value_1 = self.acc
         value_2 = self.memory[self.address]
-        if operation == "+":
-            return value_1 + value_2
-        elif operation == "-":
-            return value_1 - value_2
-        elif operation == "*":
-            return value_1 * value_2
-        elif operation == "/":
-            return value_1 / value_2
-        elif operation == "%":
-            return value_1 % value_2
-        elif operation == "<" or operation == "==" or operation == ">":
-            if value_1 < value_2:
-                return -1
-            elif value_1 == value_2:
-                return 0
-            elif value_1 > value_2:
-                return 1
-        elif operation == "inc":
-            return value_1 + 1
-        elif operation == "dec":
-            return value_1 - 1
+        new_value = 0
+        if operation in list(actions_for_alu.keys()):
+            new_value = actions_for_alu[operation](value_1, value_2)
         else:
             print("Now it doesn't work")
-            return 0
+        return new_value
+actions_for_alu = {"+": lambda x, y: x + y, "-": lambda x, y: x - y, "*": lambda x, y: x * y,
+                   "/": lambda x, y: x / y, "%": lambda x, y: x % y, "inc": lambda x, y: x + 1,
+                   "dec": lambda x, y: x - 1, "<": lambda x, y: -1 if x < y else 0 if x == y else 1,
+                   "==": lambda x, y: -1 if x < y else 0 if x == y else 1,
+                   ">": lambda x, y: -1 if x < y else 0 if x == y else 1}
