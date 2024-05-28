@@ -11,7 +11,6 @@ import tempfile
 
 import machine
 import pytest
-
 import translator
 
 

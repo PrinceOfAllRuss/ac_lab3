@@ -1,8 +1,9 @@
 import json
 import logging
 
+
 def from_machine_code_to_memory(target, memory_size):
-    f = open(target, "r")
+    f = open(target)
     machine_code = f.read()
     f.close()
     machine_array = json.loads(machine_code)
@@ -23,7 +24,7 @@ def from_machine_code_to_memory(target, memory_size):
             memory[index] = operation
     return memory
 
-class Operation():
+class Operation:
     def __init__(self, name = "", args = []):
         self.name = name
         self.args = args

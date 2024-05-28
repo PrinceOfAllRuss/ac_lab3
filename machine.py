@@ -4,10 +4,11 @@ import sys
 from control_unit import ControlUnit
 from isa import from_machine_code_to_memory
 
+
 def main(target, input_file):
     memory = from_machine_code_to_memory(target, 70)
 
-    f = open(input_file, 'r')
+    f = open(input_file)
     input_data = f.read()
     f.close()
     input_array = list(input_data)
@@ -25,7 +26,7 @@ def main(target, input_file):
     f.close()
     print(str_result)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
     main(code_file, input_file)

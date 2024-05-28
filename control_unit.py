@@ -1,6 +1,8 @@
 import logging
+
 from data_path import DataPath
 from isa import Operation, opcode, opcode_keys
+
 
 class ControlUnit:
     def __init__(self, memory: [], input_data):
@@ -27,9 +29,9 @@ class ControlUnit:
         try:
             while not self.program_end_condition and self.program_counter < limit:
                 operation: Operation = self.memory[self.address]
-                logging.debug(f'PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} '
-                              f'MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} '
-                              f'COMMAND: {operation.name} {operation.args}')
+                logging.debug(f"PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} "
+                              f"MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} "
+                              f"COMMAND: {operation.name} {operation.args}")
                 if operation.name in opcode_keys:
                     callable_operation: Operation = opcode[operation.name]
                     callable_operation.name = operation.name
