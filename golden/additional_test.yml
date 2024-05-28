@@ -56,7 +56,7 @@ out_code: |-
   {"index": 24, "data": 10},
   {"index": 26, "data": 0}]
 out_stdout: |+
-  source LoC: 27 code instr: 20
+  source LoC: 27 code instr: 21
   ============================================================
   9
   8

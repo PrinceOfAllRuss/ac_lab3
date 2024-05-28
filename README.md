@@ -172,3 +172,220 @@ comment ::= ";" <any symbols except "\n">
 
 ## Модель процессора
 
+Интерфейс командной строки: `machine.py <machine_code_file> <input_file>`
+
+Реализовано в модуле: [machine](./machine.py).
+
+### DataPath
+
+<img src="">
+
+Реализован в классе [DataPath](./data_path.py)
+
+`memory` -- однопортовая память, поэтому либо читаем, либо пишем.
+
+Сигналы (обрабатываются за один такт, реализованы в виде методов класса):
+
+- `latch_addr` -- защёлкнуть выбранное значение в `data_addr`;
+- `latch_acc` -- защёлкнуть в аккумулятор выбранное значение;
+  - выход из памяти
+  - результат операции в алу
+  - значение из порта ввода 
+- `latch_op` -- защёлкнуть значение регистра операнда
+  - Берётся значение аккумулятора
+- `wr` -- записать значение в память;
+  - выход из аккумулятора
+  - результат операции в алу
+  - значение из порта ввода
+- `output` -- записать аккумулятор в порт вывода.
+  - Строкой
+  - Числом
+
+Сигналы для ControlUnit:
+
+- `z` -- отражает наличие нулевого значения в аккумуляторе.
+- `jc` -- отражает результат операции сравнения алу.
+
+### ControlUnit
+
+<img src="">
+
+Реализован в классе [ControlUnit](./control_unit.py)
+
+- `program_address` - регистр указатель на исполняемую инструкцию в памяти
+
+- Hardwired (реализовано полностью на Python).
+- Метод `start` моделирует выполнение полного цикла инструкции.
+- Counter реализован неявно внутри метода `start`
+
+Сигнал:
+
+- `latch_program_address` -- сигнал для обновления счётчика команд в ControlUnit.
+  - +1
+  - адрес из команды
+
+Особенности работы модели:
+
+- Цикл симуляции осуществляется в функции `start`.
+- Шаг моделирования соответствует одной инструкции с выводом состояния в журнал.
+- Для журнала состояний процессора используется стандартный модуль `logging`.
+- Количество инструкций для моделирования лимитировано (10000).
+- Остановка моделирования осуществляется при:
+    - превышении лимита количества выполняемых инструкций;
+    - превышении лимита памяти
+    - при превышении лимита в ячейке памяти
+
+## Тестирование
+
+Тестирование выполняется при помощи golden test-ов.
+
+Тесты реализованы в: [golden_test.py](./golden_test.py)
+Конфигурации:
+- [golden/cat.yml](golden/cat.yml)
+- [golden/hello.yml](golden/hello.yml)
+- [golden/hello_user.yml](golden/hello_user.yml)
+- [golden/prob1.yml](golden/prob1.yml)
+- [golden/additional_test.yml](golden/additional_test.yml)
+
+Запустить тесты: `poetry run pytest . -v`
+
+Обновить конфигурацию golden tests:  `poetry run pytest . -v --update-goldens`
+
+CI при помощи Github Action:
+
+Пример использования и журнал работы процессора на примере `cat`:
+
+``` commandline
+(.venv) PS D:\2_year\2_half\AC\lab3> cat .\tests\cat.txt
+.code:
+    loop:
+        jz break    ; Комментарий
+        in 0
+        out 1 str
+        jmp loop
+    break:
+        halt
+(.venv) PS D:\2_year\2_half\AC\lab3> cat .\input_for_tests\input_for_test_cat.txt
+a
+b
+c
+Hello
+(.venv) PS D:\2_year\2_half\AC\lab3> python ./translator.py .\tests\hello_user.txt .\machine_code.txt
+source LoC: 8 code instr: 5
+============================================================
+(.venv) PS D:\2_year\2_half\AC\lab3> cat .\machine_code.txt
+[{"index": 0, "operation": "jz", "arg": [4]},
+{"index": 1, "operation": "in", "arg": [0]},
+{"index": 2, "operation": "out", "arg": [1, "str"]},
+{"index": 3, "operation": "jmp", "arg": [0]},
+{"index": 4, "operation": "halt"}]
+(.venv) PS D:\2_year\2_half\AC\lab3> python .\machine.py .\tests\cat.txt .\input_for_tests\input_for_test_cat.txt
+DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 1 TICK: 1 P_ADDR: 1 MEM_ADDR: 0 ACC: 0 COMMAND: in [0]
+DEBUG   isa:perform       input: "a"
+DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 0 ACC: 97 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "" << "a"
+DEBUG   control_unit:start         PC: 3 TICK: 5 P_ADDR: 3 MEM_ADDR: 0 ACC: 97 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 4 TICK: 6 P_ADDR: 0 MEM_ADDR: 0 ACC: 97 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 5 TICK: 7 P_ADDR: 1 MEM_ADDR: 0 ACC: 97 COMMAND: in [0]
+DEBUG   isa:perform       input: "\n"
+DEBUG   control_unit:start         PC: 6 TICK: 9 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a" << "\n"
+DEBUG   control_unit:start         PC: 7 TICK: 11 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 8 TICK: 12 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 9 TICK: 13 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
+DEBUG   isa:perform       input: "b"
+DEBUG   control_unit:start         PC: 10 TICK: 15 P_ADDR: 2 MEM_ADDR: 0 ACC: 98 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\n" << "b"
+DEBUG   control_unit:start         PC: 11 TICK: 17 P_ADDR: 3 MEM_ADDR: 0 ACC: 98 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 12 TICK: 18 P_ADDR: 0 MEM_ADDR: 0 ACC: 98 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 13 TICK: 19 P_ADDR: 1 MEM_ADDR: 0 ACC: 98 COMMAND: in [0]
+DEBUG   isa:perform       input: "\n"
+DEBUG   control_unit:start         PC: 14 TICK: 21 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb" << "\n"
+DEBUG   control_unit:start         PC: 15 TICK: 23 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 16 TICK: 24 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 17 TICK: 25 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
+DEBUG   isa:perform       input: "c"
+DEBUG   control_unit:start         PC: 18 TICK: 27 P_ADDR: 2 MEM_ADDR: 0 ACC: 99 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\n" << "c"
+DEBUG   control_unit:start         PC: 19 TICK: 29 P_ADDR: 3 MEM_ADDR: 0 ACC: 99 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 20 TICK: 30 P_ADDR: 0 MEM_ADDR: 0 ACC: 99 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 21 TICK: 31 P_ADDR: 1 MEM_ADDR: 0 ACC: 99 COMMAND: in [0]
+DEBUG   isa:perform       input: "\n"
+DEBUG   control_unit:start         PC: 22 TICK: 33 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc" << "\n"
+DEBUG   control_unit:start         PC: 23 TICK: 35 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 24 TICK: 36 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 25 TICK: 37 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
+DEBUG   isa:perform       input: "H"
+DEBUG   control_unit:start         PC: 26 TICK: 39 P_ADDR: 2 MEM_ADDR: 0 ACC: 72 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\n" << "H"
+DEBUG   control_unit:start         PC: 27 TICK: 41 P_ADDR: 3 MEM_ADDR: 0 ACC: 72 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 28 TICK: 42 P_ADDR: 0 MEM_ADDR: 0 ACC: 72 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 29 TICK: 43 P_ADDR: 1 MEM_ADDR: 0 ACC: 72 COMMAND: in [0]
+DEBUG   isa:perform       input: "e"
+DEBUG   control_unit:start         PC: 30 TICK: 45 P_ADDR: 2 MEM_ADDR: 0 ACC: 101 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\nH" << "e"
+DEBUG   control_unit:start         PC: 31 TICK: 47 P_ADDR: 3 MEM_ADDR: 0 ACC: 101 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 32 TICK: 48 P_ADDR: 0 MEM_ADDR: 0 ACC: 101 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 33 TICK: 49 P_ADDR: 1 MEM_ADDR: 0 ACC: 101 COMMAND: in [0]
+DEBUG   isa:perform       input: "l"
+DEBUG   control_unit:start         PC: 34 TICK: 51 P_ADDR: 2 MEM_ADDR: 0 ACC: 108 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\nHe" << "l"
+DEBUG   control_unit:start         PC: 35 TICK: 53 P_ADDR: 3 MEM_ADDR: 0 ACC: 108 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 36 TICK: 54 P_ADDR: 0 MEM_ADDR: 0 ACC: 108 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 37 TICK: 55 P_ADDR: 1 MEM_ADDR: 0 ACC: 108 COMMAND: in [0]
+DEBUG   isa:perform       input: "l"
+DEBUG   control_unit:start         PC: 38 TICK: 57 P_ADDR: 2 MEM_ADDR: 0 ACC: 108 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\nHel" << "l"
+DEBUG   control_unit:start         PC: 39 TICK: 59 P_ADDR: 3 MEM_ADDR: 0 ACC: 108 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 40 TICK: 60 P_ADDR: 0 MEM_ADDR: 0 ACC: 108 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 41 TICK: 61 P_ADDR: 1 MEM_ADDR: 0 ACC: 108 COMMAND: in [0]
+DEBUG   isa:perform       input: "o"
+DEBUG   control_unit:start         PC: 42 TICK: 63 P_ADDR: 2 MEM_ADDR: 0 ACC: 111 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\nHell" << "o"
+DEBUG   control_unit:start         PC: 43 TICK: 65 P_ADDR: 3 MEM_ADDR: 0 ACC: 111 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 44 TICK: 66 P_ADDR: 0 MEM_ADDR: 0 ACC: 111 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 45 TICK: 67 P_ADDR: 1 MEM_ADDR: 0 ACC: 111 COMMAND: in [0]
+DEBUG   isa:perform       input: "\n"
+DEBUG   control_unit:start         PC: 46 TICK: 69 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
+DEBUG   isa:perform       out: "a\nb\nc\nHello" << "\n"
+DEBUG   control_unit:start         PC: 47 TICK: 71 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 48 TICK: 72 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 49 TICK: 73 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
+DEBUG   control_unit:start         PC: 50 TICK: 75 P_ADDR: 2 MEM_ADDR: 0 ACC: 0 COMMAND: out [1, 'str']
+DEBUG   control_unit:start         PC: 51 TICK: 77 P_ADDR: 3 MEM_ADDR: 0 ACC: 0 COMMAND: jmp [0]
+DEBUG   control_unit:start         PC: 52 TICK: 78 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
+DEBUG   control_unit:start         PC: 53 TICK: 80 P_ADDR: 4 MEM_ADDR: 0 ACC: 0 COMMAND: halt []
+```
+
+Пример проверки исходного кода:
+
+``` commandline
+(.venv) PS D:\2_year\2_half\AC\lab3> poetry run pytest . -v                 
+============================================ test session starts ============================================
+platform win32 -- Python 3.10.7, pytest-8.2.1, pluggy-1.5.0 -- D:\2_year\2_half\AC\lab3\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\2_year\2_half\AC\lab3
+configfile: pyproject.toml
+plugins: golden-0.2.2
+collected 5 items                                                                                                                                                                  
+
+golden_test.py::test_translator_and_machine[golden/additional_test.yml] PASSED                          [ 20%]
+golden_test.py::test_translator_and_machine[golden/cat.yml] PASSED                                      [ 40%]
+golden_test.py::test_translator_and_machine[golden/hello.yml] PASSED                                    [ 60%]
+golden_test.py::test_translator_and_machine[golden/hello_user.yml] PASSED                               [ 80%]
+golden_test.py::test_translator_and_machine[golden/prob1.yml] PASSED                                    [100%]
+
+============================================ 5 passed in 1.26s ============================================
+(.venv) PS D:\2_year\2_half\AC\lab3>  
+```
+
+```text
+| ФИО                     | алг        | LoC  | code байт | code инстр. | инстр.    | такт.    | вариант |
+| Филатов Фёдор Романович | cat        | 8    | -         | 5           | 53        | 80       | -       |
+| Филатов Фёдор Романович | hello      | 10   | -         | 5           | 38        | 74       | -       |
+| Филатов Фёдор Романович | hello_user | 26   | -         | 17          | 152       | 310      | -       |
+| Филатов Фёдор Романович | prob1      | 28   | -         | 16          | 9461      | 36374    | -       |
+```

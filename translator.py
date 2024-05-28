@@ -1,4 +1,6 @@
 import re
+import sys
+
 from isa import opcode_keys
 
 def write_str_to_memory(str_data, machine_code, index):
@@ -108,7 +110,7 @@ def from_language_to_machine_code(program: str):
     for i in all_labels:
         machine_code = re.sub(f'"{i}"', f'{labels[i]}', machine_code)
 
-    print("source LoC:", lines_of_code, "code instr:", instr_count)
+    print("source LoC:", lines_of_code, "code instr:", instr_count + 1)
     print("============================================================")
 
     return machine_code
@@ -122,3 +124,8 @@ def main(source, target):
 
     with open(target, "w", encoding="utf-8") as file:
         file.write(machine_code)
+
+if __name__ == "__main__":
+    assert len(sys.argv) == 3, "Wrong arguments: translator.py <code_file> <machine_code_file>"
+    _, source, target = sys.argv
+    main(source, target)

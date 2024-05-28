@@ -80,7 +80,7 @@ out_code: |-
   {"index": 49, "data": 32},
   {"index": 51, "data": 0}]
 out_stdout: |+
-  source LoC: 26 code instr: 16
+  source LoC: 26 code instr: 17
   ============================================================
   < What is your name?
   > Fedor

@@ -54,7 +54,7 @@ out_code: |-
   {"index": 21, "data": 0},
   {"index": 22, "data": 0}]
 out_stdout: |
-  source LoC: 28 code instr: 15
+  source LoC: 28 code instr: 16
   ============================================================
   233168
 out_log: |

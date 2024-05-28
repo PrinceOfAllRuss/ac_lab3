@@ -30,7 +30,7 @@ out_code: |-
   {"index": 15, "data": 100},
   {"index": 17, "data": 0}]
 out_stdout: |
-  source LoC: 10 code instr: 4
+  source LoC: 10 code instr: 5
   ============================================================
   Hello world
 out_log: |

@@ -3,13 +3,10 @@ class DataPath:
         self.memory = memory
         self.address = 0
         self.acc = 0
-        self.line_break_latch = -1
         self.buffer = [input_data, []]
 
     def set_address(self, addr):
         self.address = addr
-    def set_line_break(self, line_break):
-        self.line_break_latch = line_break
     def inc_address(self):
         self.address += 1
     def dec_address(self):
