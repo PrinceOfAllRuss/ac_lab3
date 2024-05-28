@@ -24,12 +24,16 @@ def from_machine_code_to_memory(target, memory_size):
             memory[index] = operation
     return memory
 
+
 class Operation:
-    def __init__(self, name = "", args = []):
+    def __init__(self, name="", args=[]):
         self.name = name
         self.args = args
+
     def perform(self, control_unit):
         return
+
+
 class Mov(Operation):
     def perform(self, control_unit):
         if len(self.args) == 1:
@@ -62,6 +66,8 @@ class Mov(Operation):
             control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Inc(Operation):
     def perform(self, control_unit):
         control_unit.data_path.set_address(self.args[0])
@@ -71,6 +77,8 @@ class Inc(Operation):
         control_unit.data_path.write_value_to_memory(0, "inc", None)
         control_unit.tick()
         control_unit.select_address(None)
+
+
 class Dec(Operation):
     def perform(self, control_unit):
         control_unit.data_path.set_address(self.args[0])
@@ -80,10 +88,14 @@ class Dec(Operation):
         control_unit.data_path.write_value_to_memory(0, "dec", None)
         control_unit.tick()
         control_unit.select_address(None)
+
+
 class Jmp(Operation):
     def perform(self, control_unit):
         next_operation_address = self.args[0]
         control_unit.select_address(next_operation_address)
+
+
 class Jz(Operation):
     def perform(self, control_unit):
         if control_unit.jump_condition == 0:
@@ -93,6 +105,8 @@ class Jz(Operation):
             control_unit.tick()
         else:
             control_unit.select_address(None)
+
+
 class Je(Operation):
     def perform(self, control_unit):
         if control_unit.je_condition == 0:
@@ -102,6 +116,8 @@ class Je(Operation):
             control_unit.tick()
         else:
             control_unit.select_address(None)
+
+
 class Jb(Operation):
     def perform(self, control_unit):
         if control_unit.je_condition == 1:
@@ -111,6 +127,8 @@ class Jb(Operation):
             control_unit.tick()
         else:
             control_unit.select_address(None)
+
+
 class Jl(Operation):
     def perform(self, control_unit):
         if control_unit.je_condition == -1:
@@ -120,6 +138,8 @@ class Jl(Operation):
             control_unit.tick()
         else:
             control_unit.select_address(None)
+
+
 class Cmp(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -134,6 +154,8 @@ class Cmp(Operation):
         control_unit.je_condition = control_unit.data_path.write_value_to_acc(0, "==", None)
         control_unit.tick()
         control_unit.select_address(None)
+
+
 class Add(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -159,6 +181,8 @@ class Add(Operation):
         control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Sub(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -184,6 +208,8 @@ class Sub(Operation):
         control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Mul(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -209,6 +235,8 @@ class Mul(Operation):
         control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Div(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -234,6 +262,8 @@ class Div(Operation):
         control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Rmd(Operation):
     def perform(self, control_unit):
         first_address = self.args[0]
@@ -255,9 +285,10 @@ class Rmd(Operation):
         control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class In(Operation):
     def perform(self, control_unit):
-
         if len(self.args) == 2:
             addr = self.args[1]
             control_unit.data_path.set_address(addr)
@@ -289,6 +320,8 @@ class In(Operation):
             control_unit.tick()
 
         control_unit.select_address(None)
+
+
 class Out(Operation):
     def perform(self, control_unit):
         port = self.args[0]
@@ -300,6 +333,7 @@ class Out(Operation):
         elif el_type == "str":
             self.perform_for_str(control_unit, output, port)
         control_unit.select_address(None)
+
     def perform_for_numb(self, control_unit, output, port):
         if control_unit.out_condition == 0:
             if control_unit.jump_condition != 0:
@@ -314,6 +348,7 @@ class Out(Operation):
                 logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
                 control_unit.data_path.out_acc(False, port)
                 control_unit.tick()
+
     def perform_for_str(self, control_unit, output, port):
         if control_unit.out_condition == 0:
             if control_unit.jump_condition != 0:
@@ -330,6 +365,7 @@ class Out(Operation):
                 control_unit.tick()
                 control_unit.data_path.inc_address()
                 control_unit.tick()
+
     def correct_out(self, output, control_unit):
         if control_unit.jump_condition == 10:
             enter = "\\n"
@@ -337,14 +373,47 @@ class Out(Operation):
         else:
             logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.acc)}"')
 
+
 class Halt(Operation):
     def perform(self, control_unit):
         control_unit.program_end_condition = True
 
-opcode = {"mov": Mov(), "inc": Inc(), "dec": Dec(), "add": Add(),
-          "sub": Sub(), "mul": Mul(), "div": Div(), "rmd": Rmd(),
-          "jmp": Jmp(), "jz": Jz(), "je": Je(), "jb": Jb(), "jl": Jl(),
-          "cmp": Cmp(), "in": In(), "out": Out(), "halt": Halt()}
-opcode_keys = ["mov", "inc", "dec", "add", "sub",
-               "mul", "div", "rmd", "jmp", "jz",
-               "je", "jb", "jl", "cmp", "in", "out", "halt"]
+
+opcode = {
+    "mov": Mov(),
+    "inc": Inc(),
+    "dec": Dec(),
+    "add": Add(),
+    "sub": Sub(),
+    "mul": Mul(),
+    "div": Div(),
+    "rmd": Rmd(),
+    "jmp": Jmp(),
+    "jz": Jz(),
+    "je": Je(),
+    "jb": Jb(),
+    "jl": Jl(),
+    "cmp": Cmp(),
+    "in": In(),
+    "out": Out(),
+    "halt": Halt(),
+}
+opcode_keys = [
+    "mov",
+    "inc",
+    "dec",
+    "add",
+    "sub",
+    "mul",
+    "div",
+    "rmd",
+    "jmp",
+    "jz",
+    "je",
+    "jb",
+    "jl",
+    "cmp",
+    "in",
+    "out",
+    "halt",
+]

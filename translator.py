@@ -15,6 +15,8 @@ def write_str_to_memory(str_data, machine_code, index):
     machine_code += f'{{"index": {index + 1!s}, "data": {0}'
 
     return machine_code, index
+
+
 def get_variable_name(data, i):
     if data[i + 1].count('"') == 2:
         str_data = re.sub('"', "", data[i + 1])
@@ -27,6 +29,8 @@ def get_variable_name(data, i):
         else:
             str_data += f"{data[i + 1]}"[:-1]
     return str_data, i
+
+
 def get_command_args(machine_code, index, data, j):
     new_el = re.sub(r",", "", data[j])
     if re.search(r"[a-zA-Z]", new_el) is None:
@@ -43,6 +47,8 @@ def get_command_args(machine_code, index, data, j):
         else:
             machine_code += ", "
     return machine_code, index
+
+
 def get_command(machine_code, index, data, j):
     machine_code += f'{{"index": {index}, "operation": "{data[j]}"'
     if j == len(data) - 1:
@@ -57,6 +63,8 @@ def get_command(machine_code, index, data, j):
             machine_code += "},\n"
             index += 1
     return machine_code, index
+
+
 def get_all_commands(labels, machine_code, index, data):
     for i in range(len(data)):
         if data[i] == ".code:":
@@ -69,6 +77,8 @@ def get_all_commands(labels, machine_code, index, data):
                     machine_code, index = get_command_args(machine_code, index, data, j)
             break
     return labels, machine_code, index
+
+
 def get_all_data(machine_code, index, data):
     if data[0] == ".data:":
         dict_for_variable_names = {}
@@ -100,6 +110,8 @@ def get_all_data(machine_code, index, data):
     else:
         machine_code = f"{machine_code[:-2]}]"
     return machine_code, index
+
+
 def from_language_to_machine_code(program: str):
     lines_of_code = len(program.split("\n"))
     program = re.sub("\\s*;\\s*.*\\s*\n", "\n", program)
@@ -125,6 +137,7 @@ def from_language_to_machine_code(program: str):
 
     return machine_code
 
+
 def main(source, target):
     f = open(source)
     program = f.read()
@@ -134,6 +147,7 @@ def main(source, target):
 
     with open(target, "w", encoding="utf-8") as file:
         file.write(machine_code)
+
 
 if __name__ == "__main__":
     assert len(sys.argv) == 3, "Wrong arguments: translator.py <code_file> <machine_code_file>"

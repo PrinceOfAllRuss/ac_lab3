@@ -13,8 +13,8 @@ class ControlUnit:
         self.data_path = DataPath(memory, input_data)
         self.program_end_condition = False
         self.jump_condition = -1
-        self.je_condition = None # -1 -> el1 < el2; 0 -> el1 = el2; 1 -> el1 > el2
-        self.out_condition = 1 # 0 - acc -> out, 1 - memory -> acc -> out
+        self.je_condition = None  # -1 -> el1 < el2; 0 -> el1 = el2; 1 -> el1 > el2
+        self.out_condition = 1  # 0 - acc -> out, 1 - memory -> acc -> out
 
     def tick(self):
         self.tick_counter += 1
@@ -24,14 +24,17 @@ class ControlUnit:
             self.address += 1
         else:
             self.address = next_addr
+
     def start(self, limit):
         self.program_counter = 0
         try:
             while not self.program_end_condition and self.program_counter < limit:
                 operation: Operation = self.memory[self.address]
-                logging.debug(f"PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} "
-                              f"MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} "
-                              f"COMMAND: {operation.name} {operation.args}")
+                logging.debug(
+                    f"PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} "
+                    f"MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} "
+                    f"COMMAND: {operation.name} {operation.args}"
+                )
                 if operation.name in opcode_keys:
                     callable_operation: Operation = opcode[operation.name]
                     callable_operation.name = operation.name

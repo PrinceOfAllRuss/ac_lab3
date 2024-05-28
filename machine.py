@@ -26,6 +26,7 @@ def main(target, input_file):
     f.close()
     print(str_result)
 
+
 if __name__ == "__main__":
     assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
