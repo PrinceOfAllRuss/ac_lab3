@@ -76,7 +76,7 @@ comment ::= ";" <any symbols except "\n">
 ```text
            Registers
 +------------------------------+
-| acc  ap  ar                  |
+| acc  ap  ar  or                |
 +------------------------------+
 
   Instruction and data memory
