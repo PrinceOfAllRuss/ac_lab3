@@ -27,8 +27,8 @@ out_stdout: |+
   Hello
 
 out_log: |
-  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 1 TICK: 1 P_ADDR: 1 MEM_ADDR: 0 ACC: 0 COMMAND: in [0]
+  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: -1 COMMAND: jz [4]
+  DEBUG   control_unit:start         PC: 1 TICK: 1 P_ADDR: 1 MEM_ADDR: 0 ACC: -1 COMMAND: in [0]
   DEBUG   isa:perform       input: "a"
   DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 0 ACC: 97 COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "" << "a"
@@ -104,4 +104,4 @@ out_log: |
   DEBUG   control_unit:start         PC: 50 TICK: 75 P_ADDR: 2 MEM_ADDR: 0 ACC: 0 COMMAND: out [1, 'str']
   DEBUG   control_unit:start         PC: 51 TICK: 77 P_ADDR: 3 MEM_ADDR: 0 ACC: 0 COMMAND: jmp [0]
   DEBUG   control_unit:start         PC: 52 TICK: 78 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 53 TICK: 80 P_ADDR: 4 MEM_ADDR: 0 ACC: 0 COMMAND: halt []
+  DEBUG   control_unit:start         PC: 53 TICK: 81 P_ADDR: 4 MEM_ADDR: 0 ACC: -1 COMMAND: halt []

@@ -2,9 +2,15 @@ class DataPath:
     def __init__(self, memory: [], input_data: []):
         self.memory = memory
         self.address = 0
-        self.acc = 0
+        self.acc = -1
         self.buffer = [input_data, []]
 
+    def zero(self):
+        return self.acc == 0
+    def jl_condition(self):
+        return self.acc == -1
+    def jb_condition(self):
+        return self.acc == 1
     def set_address(self, addr):
         self.address = addr
 
@@ -21,7 +27,6 @@ class DataPath:
             self.memory[self.address] = self.perform_alu_operation(operation)
         elif sel == 1:
             self.memory[self.address] = self.acc
-        return self.memory[self.address]
 
     def write_value_to_acc(self, sel, operation, port):
         if sel == -1:
@@ -30,22 +35,12 @@ class DataPath:
             self.acc = self.perform_alu_operation(operation)
         elif sel == 1:
             self.acc = self.memory[self.address]
-        return self.acc
 
     def out_acc(self, translation_status, port):
         if translation_status:
             self.buffer[port].append(str(chr(self.acc)))
         else:
             self.buffer[port].append(str(self.acc))
-        return self.acc
-
-    def data_address(self, addr, inc, dec):
-        new_addr = addr
-        if inc:
-            new_addr += 1
-        elif dec:
-            new_addr -= 1
-        return new_addr
 
     def perform_alu_operation(self, operation):
         value_1 = self.acc

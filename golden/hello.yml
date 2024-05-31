@@ -34,9 +34,9 @@ out_stdout: |
   ============================================================
   Hello world
 out_log: |
-  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: mov [5]
-  DEBUG   control_unit:start         PC: 1 TICK: 2 P_ADDR: 1 MEM_ADDR: 5 ACC: 0 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 5 ACC: 0 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: -1 COMMAND: mov [5]
+  DEBUG   control_unit:start         PC: 1 TICK: 2 P_ADDR: 1 MEM_ADDR: 5 ACC: -1 COMMAND: jz [4]
+  DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 5 ACC: -1 COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "" << "H"
   DEBUG   control_unit:start         PC: 3 TICK: 7 P_ADDR: 3 MEM_ADDR: 6 ACC: 72 COMMAND: jmp [1]
   DEBUG   control_unit:start         PC: 4 TICK: 8 P_ADDR: 1 MEM_ADDR: 6 ACC: 72 COMMAND: jz [4]
@@ -83,4 +83,4 @@ out_log: |
   DEBUG   control_unit:start         PC: 35 TICK: 69 P_ADDR: 2 MEM_ADDR: 16 ACC: 100 COMMAND: out [1, 'str']
   DEBUG   control_unit:start         PC: 36 TICK: 71 P_ADDR: 3 MEM_ADDR: 16 ACC: 0 COMMAND: jmp [1]
   DEBUG   control_unit:start         PC: 37 TICK: 72 P_ADDR: 1 MEM_ADDR: 16 ACC: 0 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 38 TICK: 74 P_ADDR: 4 MEM_ADDR: 16 ACC: 0 COMMAND: halt []
+  DEBUG   control_unit:start         PC: 38 TICK: 75 P_ADDR: 4 MEM_ADDR: 16 ACC: -1 COMMAND: halt []

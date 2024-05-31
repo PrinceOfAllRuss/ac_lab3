@@ -12,8 +12,6 @@ class ControlUnit:
         self.program_counter = 0
         self.data_path = DataPath(memory, input_data)
         self.program_end_condition = False
-        self.jump_condition = -1
-        self.je_condition = None  # -1 -> el1 < el2; 0 -> el1 = el2; 1 -> el1 > el2
         self.out_condition = 1  # 0 - acc -> out, 1 - memory -> acc -> out
 
     def tick(self):
