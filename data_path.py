@@ -8,6 +8,9 @@ class DataPath:
     def zero(self):
         return self.acc == 0
 
+    def je_condition(self):
+        return self.acc == 0
+
     def jl_condition(self):
         return self.acc == -1
 

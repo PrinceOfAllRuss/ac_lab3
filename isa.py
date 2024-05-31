@@ -110,7 +110,7 @@ class Jz(Operation):
 
 class Je(Operation):
     def perform(self, control_unit):
-        if control_unit.data_path.zero():
+        if control_unit.data_path.je_condition():
             next_operation_address = self.args[0]
             control_unit.select_address(next_operation_address)
             control_unit.tick()
