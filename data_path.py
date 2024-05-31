@@ -7,10 +7,13 @@ class DataPath:
 
     def zero(self):
         return self.acc == 0
+
     def jl_condition(self):
         return self.acc == -1
+
     def jb_condition(self):
         return self.acc == 1
+
     def set_address(self, addr):
         self.address = addr
 

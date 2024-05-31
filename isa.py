@@ -300,7 +300,8 @@ class In(Operation):
             control_unit.data_path.set_address(addr)
             control_unit.tick()
             port = self.args[0]
-            control_unit.out_condition = 1
+            control_unit.out_condition_register = 1
+            control_unit.tick()
 
             while not control_unit.data_path.zero():
                 control_unit.data_path.write_value_to_memory(-1, None, port)
@@ -319,7 +320,8 @@ class In(Operation):
             control_unit.tick()
         else:
             port = self.args[0]
-            control_unit.out_condition = 0
+            control_unit.out_condition_register = 0
+            control_unit.tick()
             control_unit.data_path.write_value_to_acc(-1, None, port)
             control_unit.tick()
             if control_unit.data_path.acc == 10:
@@ -344,13 +346,14 @@ class Out(Operation):
         control_unit.select_address(None)
 
     def perform_for_numb(self, control_unit, output, port):
-        if control_unit.out_condition == 0:
+        if control_unit.out_condition_register == 0:
             if not control_unit.data_path.zero():
                 logging.debug(f'out: "{output}" << "{control_unit.data_path.acc}"')
                 control_unit.data_path.out_acc(False, port)
-            control_unit.out_condition = 1
+                control_unit.tick()
+            control_unit.out_condition_register = 1
             control_unit.tick()
-        elif control_unit.out_condition == 1:
+        elif control_unit.out_condition_register == 1:
             control_unit.data_path.write_value_to_acc(1, None, None)
             control_unit.tick()
             if not control_unit.data_path.zero():
@@ -359,13 +362,14 @@ class Out(Operation):
                 control_unit.tick()
 
     def perform_for_str(self, control_unit, output, port):
-        if control_unit.out_condition == 0:
+        if control_unit.out_condition_register == 0:
             if not control_unit.data_path.zero():
                 self.correct_out(output, control_unit)
                 control_unit.data_path.out_acc(True, port)
-            control_unit.out_condition = 1
+                control_unit.tick()
+            control_unit.out_condition_register = 1
             control_unit.tick()
-        elif control_unit.out_condition == 1:
+        elif control_unit.out_condition_register == 1:
             control_unit.data_path.write_value_to_acc(1, None, None)
             control_unit.tick()
             if not control_unit.data_path.zero():

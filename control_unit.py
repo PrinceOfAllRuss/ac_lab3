@@ -12,7 +12,7 @@ class ControlUnit:
         self.program_counter = 0
         self.data_path = DataPath(memory, input_data)
         self.program_end_condition = False
-        self.out_condition = 1  # 0 - acc -> out, 1 - memory -> acc -> out
+        self.out_condition_register = 1  # 0 - acc -> out, 1 - memory -> acc -> out
 
     def tick(self):
         self.tick_counter += 1
