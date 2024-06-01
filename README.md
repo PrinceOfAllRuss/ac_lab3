@@ -8,51 +8,59 @@
 ## Язык программирования
 
 ``` ebnf
-program ::= { line }
+<program> ::= { <line> }
 
-line ::= label [ comment ] "\n"
-       | instr [ comment ] "\n"
-       | [ comment ] "\n"
+<line> ::= <label> [ <comment> ] "\n"
+       | <instr> [ <comment> ] "\n"
+       | <instr_with_variable_number_of_arguments> [ <comment> ] "\n"
+       | <instr_with_jump> [ <comment> ] "\n"
+       | [ <comment> ] "\n"
 
-label ::= label_name ":"
+<label> ::= <label_name> ":"
 
-instr ::= op0
-        | op1 positive_integer
-        | op2 positive_integer, type
-        | op3 address 
+<instr> ::= "halt"
+        | "mov" <register>
+        | "mov" <address>
+        | "lend" <register> <address>
+        | "lend <address> <register>
+        | "inc" <register>
+        | "inc" <address>
+        | "dec" <register>
+        | "dec" <address>
+        | "rmd" <register> <register> <address>
+        | "rmd" <address> <address> <register> <register> <address>
+        | "cmp" <register> <register>
+        | "cmp" <address> <address> <register> <register> <address>
+        | "in" <port>
+        | "in" <port> <address>
+        | "out" <port> <type>
 
-op0 ::= "inc"
-      | "dec"
-      | "halt"
+<instr_with_variable_number_of_arguments> ::= "add" <args>
+      | "sub" <args>
+      | "mul" <args>
+      | "div" <args>
 
-op1 ::= "mov"
-      | "add"
-      | "sub"
-      | "mul"
-      | "div"
-      | "rmd"
-      | "cmp"
-      | "in"
+<instr_with_jump> ::= "jmp" <jmp_address>
+      | "jz" <jmp_address>
+      | "je" <jmp_address>
+      | "jb" <jmp_address>
+      | "jl" <jmp_address>
 
-op2 ::= "out"
+<comment> ::= ";" <any symbols except "\n">
 
-op3 ::= "jmp"
-      | "jz"
-      | "je"
-      | "jb"
-      | "jl"
+<label_name> ::= <any symbols from [a-zA-Z_] more than once and any symbols from [0-9] zero or more times>
 
-address ::= lable_name
-          | positive_integer
+<register> ::= <"r" and number from 0 to 12>
 
-positive_integer ::= [0-9]+
+<address> ::= <"@" and number from 0 to 70>
 
-type ::= "str"
-      | "numb"
+<port> ::= 0 | 1
 
-label_name ::= <any of "a-z A-Z _">
+<type> ::= "str" | "numb"
 
-comment ::= ";" <any symbols except "\n">
+<args> ::= <<address> two or more times> <register> <register> <address>
+
+<jmp_address> ::= <label_name> | address
 ```
 Поддерживаются однострочные комментарии, начинающиеся с ;.
 Код выполняется последовательно, одна инструкция за другой.
@@ -76,8 +84,20 @@ comment ::= ";" <any symbols except "\n">
 ```text
            Registers
 +------------------------------+
-| acc  ap  ar  or                |
+| r0                           |
+| ...                          |
+| r12                          |
+| or                           |
+| jr                           |
+| lr                           |
+| rr                           |
 +------------------------------+
+
+Регистры `r0-r12` доступные программисту
+`or` -- `r13`, хранит условие вывода: 0 - делаем вывод из регистра, адрес которого лежит в `lr`, 1 - загружаем значение из памяти в `lr`, а потом это значение выводим
+`jr` -- `r14`, хранит условие перехода для команд `jz`, `je`, `jl`, `jb`
+`lr` -- `r15`, хранит адрес регистра, который подается на левый вход в алу
+`rr` -- `r16`, хранит адрес регистра, который подается на правый вход в алу
 
   Instruction and data memory
 +------------------------------+

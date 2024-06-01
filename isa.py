@@ -63,40 +63,44 @@ class Operation:
         return int(new_arg)
 
 
+class Lend(Operation):
+    def perform(self, control_unit):
+        if "r" in self.args[0]:
+            self.check_register(0)
+            addr = self.correct_arg(0)
+            control_unit.data_path.set_left_register_address(addr)
+            control_unit.tick()
+            addr = self.correct_arg(1)
+            control_unit.data_path.set_address(addr)
+            control_unit.tick()
+            control_unit.data_path.write_value_to_memory(2, None, None, None)
+            control_unit.tick()
+        if "@" in self.args[0]:
+            addr = self.correct_arg(0)
+            control_unit.data_path.set_address(addr)
+            control_unit.tick()
+            self.check_register(1)
+            addr = self.correct_arg(1)
+            control_unit.data_path.set_left_register_address(addr)
+            control_unit.tick()
+            control_unit.data_path.write_value_to_register(1, addr, None, None)
+            control_unit.tick()
+
+        control_unit.select_address(None)
+
+
 class Mov(Operation):
     def perform(self, control_unit):
-        if len(self.args) == 1:
-            if "r" in self.args[0]:
-                self.check_register(0)
-                addr = self.correct_arg(0)
-                control_unit.data_path.set_left_register_address(addr)
-            elif "@" in self.args[0]:
-                addr = self.correct_arg(0)
-                control_unit.data_path.set_address(addr)
-            else:
-                raise ValueError("Invalid")
-            control_unit.tick()
-        elif len(self.args) == 2:
-            if "r" in self.args[0]:
-                self.check_register(0)
-                addr = self.correct_arg(0)
-                control_unit.data_path.set_left_register_address(addr)
-                control_unit.tick()
-                addr = self.correct_arg(1)
-                control_unit.data_path.set_address(addr)
-                control_unit.tick()
-                control_unit.data_path.write_value_to_memory(2, None, None, None)
-                control_unit.tick()
-            if "@" in self.args[0]:
-                addr = self.correct_arg(0)
-                control_unit.data_path.set_address(addr)
-                control_unit.tick()
-                self.check_register(1)
-                addr = self.correct_arg(1)
-                control_unit.data_path.set_left_register_address(addr)
-                control_unit.tick()
-                control_unit.data_path.write_value_to_register(1, addr, None, None)
-                control_unit.tick()
+        if "r" in self.args[0]:
+            self.check_register(0)
+            addr = self.correct_arg(0)
+            control_unit.data_path.set_left_register_address(addr)
+        elif "@" in self.args[0]:
+            addr = self.correct_arg(0)
+            control_unit.data_path.set_address(addr)
+        else:
+            raise ValueError("Invalid")
+        control_unit.tick()
 
         control_unit.select_address(None)
 
@@ -515,6 +519,7 @@ class Halt(Operation):
 
 
 opcode = {
+    "lend": Lend(),
     "mov": Mov(),
     "inc": Inc(),
     "dec": Dec(),
@@ -534,6 +539,7 @@ opcode = {
     "halt": Halt(),
 }
 opcode_keys = [
+    "lend",
     "mov",
     "inc",
     "dec",
