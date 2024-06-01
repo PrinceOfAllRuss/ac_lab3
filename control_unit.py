@@ -36,7 +36,7 @@ class ControlUnit:
                     callable_operation: Operation = opcode[operation.name]
                     callable_operation.name = operation.name
                     callable_operation.args = operation.args
-                    callable_operation.perform(self)
+                    callable_operation.execute(self)
                 self.tick()
                 self.program_counter += 1
         except EOFError:

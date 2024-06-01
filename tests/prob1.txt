@@ -8,18 +8,18 @@
     division_remainder 0
 .code:
     loop:
-        cmp i, end
+        cmp i end r0 r1
         je break
-        rmd i, del_1, division_remainder
-        cmp division_remainder, correct_remainder
+        rmd i del_1 r3 r4 division_remainder
+        cmp division_remainder correct_remainder r0 r1
         je increase_results
-        rmd i, del_2, division_remainder
-        cmp division_remainder, correct_remainder
+        rmd i del_2 r6 r7 division_remainder
+        cmp division_remainder correct_remainder r0 r1
         je increase_results
         inc i
         jmp loop
     increase_results:
-        add sum, i, sum
+        add sum i r9 r10 sum
         inc i
         jmp loop
     break:

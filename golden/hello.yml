@@ -12,10 +12,10 @@ in_source: |-
 in_stdin: |-
   Fedor
 out_code: |-
-  [{"index": 0, "operation": "mov", "arg": [5]},
-  {"index": 1, "operation": "jz", "arg": [4]},
+  [{"index": 0, "operation": "mov", "arg": ["@5"]},
+  {"index": 1, "operation": "jz", "arg": ["@4"]},
   {"index": 2, "operation": "out", "arg": [1, "str"]},
-  {"index": 3, "operation": "jmp", "arg": [1]},
+  {"index": 3, "operation": "jmp", "arg": ["@1"]},
   {"index": 4, "operation": "halt"},
   {"index": 5, "data": 72},
   {"index": 6, "data": 101},
@@ -34,53 +34,53 @@ out_stdout: |
   ============================================================
   Hello world
 out_log: |
-  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: -1 COMMAND: mov [5]
-  DEBUG   control_unit:start         PC: 1 TICK: 2 P_ADDR: 1 MEM_ADDR: 5 ACC: -1 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 5 ACC: -1 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: mov ['@5']
+  DEBUG   control_unit:start         PC: 1 TICK: 2 P_ADDR: 1 MEM_ADDR: 5 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 5 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "" << "H"
-  DEBUG   control_unit:start         PC: 3 TICK: 7 P_ADDR: 3 MEM_ADDR: 6 ACC: 72 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 4 TICK: 8 P_ADDR: 1 MEM_ADDR: 6 ACC: 72 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 5 TICK: 9 P_ADDR: 2 MEM_ADDR: 6 ACC: 72 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 3 TICK: 7 P_ADDR: 3 MEM_ADDR: 6 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 72, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 4 TICK: 8 P_ADDR: 1 MEM_ADDR: 6 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 72, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 5 TICK: 9 P_ADDR: 2 MEM_ADDR: 6 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 72, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "H" << "e"
-  DEBUG   control_unit:start         PC: 6 TICK: 13 P_ADDR: 3 MEM_ADDR: 7 ACC: 101 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 7 TICK: 14 P_ADDR: 1 MEM_ADDR: 7 ACC: 101 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 8 TICK: 15 P_ADDR: 2 MEM_ADDR: 7 ACC: 101 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 6 TICK: 13 P_ADDR: 3 MEM_ADDR: 7 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 101, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 7 TICK: 14 P_ADDR: 1 MEM_ADDR: 7 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 101, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 8 TICK: 15 P_ADDR: 2 MEM_ADDR: 7 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 101, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "He" << "l"
-  DEBUG   control_unit:start         PC: 9 TICK: 19 P_ADDR: 3 MEM_ADDR: 8 ACC: 108 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 10 TICK: 20 P_ADDR: 1 MEM_ADDR: 8 ACC: 108 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 11 TICK: 21 P_ADDR: 2 MEM_ADDR: 8 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 9 TICK: 19 P_ADDR: 3 MEM_ADDR: 8 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 10 TICK: 20 P_ADDR: 1 MEM_ADDR: 8 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 11 TICK: 21 P_ADDR: 2 MEM_ADDR: 8 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hel" << "l"
-  DEBUG   control_unit:start         PC: 12 TICK: 25 P_ADDR: 3 MEM_ADDR: 9 ACC: 108 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 13 TICK: 26 P_ADDR: 1 MEM_ADDR: 9 ACC: 108 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 14 TICK: 27 P_ADDR: 2 MEM_ADDR: 9 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 12 TICK: 25 P_ADDR: 3 MEM_ADDR: 9 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 13 TICK: 26 P_ADDR: 1 MEM_ADDR: 9 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 14 TICK: 27 P_ADDR: 2 MEM_ADDR: 9 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hell" << "o"
-  DEBUG   control_unit:start         PC: 15 TICK: 31 P_ADDR: 3 MEM_ADDR: 10 ACC: 111 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 16 TICK: 32 P_ADDR: 1 MEM_ADDR: 10 ACC: 111 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 17 TICK: 33 P_ADDR: 2 MEM_ADDR: 10 ACC: 111 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 15 TICK: 31 P_ADDR: 3 MEM_ADDR: 10 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 16 TICK: 32 P_ADDR: 1 MEM_ADDR: 10 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 17 TICK: 33 P_ADDR: 2 MEM_ADDR: 10 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello" << " "
-  DEBUG   control_unit:start         PC: 18 TICK: 37 P_ADDR: 3 MEM_ADDR: 11 ACC: 32 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 19 TICK: 38 P_ADDR: 1 MEM_ADDR: 11 ACC: 32 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 20 TICK: 39 P_ADDR: 2 MEM_ADDR: 11 ACC: 32 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 18 TICK: 37 P_ADDR: 3 MEM_ADDR: 11 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 19 TICK: 38 P_ADDR: 1 MEM_ADDR: 11 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 20 TICK: 39 P_ADDR: 2 MEM_ADDR: 11 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello " << "w"
-  DEBUG   control_unit:start         PC: 21 TICK: 43 P_ADDR: 3 MEM_ADDR: 12 ACC: 119 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 22 TICK: 44 P_ADDR: 1 MEM_ADDR: 12 ACC: 119 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 23 TICK: 45 P_ADDR: 2 MEM_ADDR: 12 ACC: 119 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 21 TICK: 43 P_ADDR: 3 MEM_ADDR: 12 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 119, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 22 TICK: 44 P_ADDR: 1 MEM_ADDR: 12 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 119, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 23 TICK: 45 P_ADDR: 2 MEM_ADDR: 12 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 119, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello w" << "o"
-  DEBUG   control_unit:start         PC: 24 TICK: 49 P_ADDR: 3 MEM_ADDR: 13 ACC: 111 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 25 TICK: 50 P_ADDR: 1 MEM_ADDR: 13 ACC: 111 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 26 TICK: 51 P_ADDR: 2 MEM_ADDR: 13 ACC: 111 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 24 TICK: 49 P_ADDR: 3 MEM_ADDR: 13 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 25 TICK: 50 P_ADDR: 1 MEM_ADDR: 13 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 26 TICK: 51 P_ADDR: 2 MEM_ADDR: 13 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 111, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello wo" << "r"
-  DEBUG   control_unit:start         PC: 27 TICK: 55 P_ADDR: 3 MEM_ADDR: 14 ACC: 114 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 28 TICK: 56 P_ADDR: 1 MEM_ADDR: 14 ACC: 114 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 29 TICK: 57 P_ADDR: 2 MEM_ADDR: 14 ACC: 114 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 27 TICK: 55 P_ADDR: 3 MEM_ADDR: 14 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 114, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 28 TICK: 56 P_ADDR: 1 MEM_ADDR: 14 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 114, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 29 TICK: 57 P_ADDR: 2 MEM_ADDR: 14 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 114, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello wor" << "l"
-  DEBUG   control_unit:start         PC: 30 TICK: 61 P_ADDR: 3 MEM_ADDR: 15 ACC: 108 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 31 TICK: 62 P_ADDR: 1 MEM_ADDR: 15 ACC: 108 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 32 TICK: 63 P_ADDR: 2 MEM_ADDR: 15 ACC: 108 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 30 TICK: 61 P_ADDR: 3 MEM_ADDR: 15 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 31 TICK: 62 P_ADDR: 1 MEM_ADDR: 15 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 32 TICK: 63 P_ADDR: 2 MEM_ADDR: 15 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 108, 0, 0] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "Hello worl" << "d"
-  DEBUG   control_unit:start         PC: 33 TICK: 67 P_ADDR: 3 MEM_ADDR: 16 ACC: 100 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 34 TICK: 68 P_ADDR: 1 MEM_ADDR: 16 ACC: 100 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 35 TICK: 69 P_ADDR: 2 MEM_ADDR: 16 ACC: 100 COMMAND: out [1, 'str']
-  DEBUG   control_unit:start         PC: 36 TICK: 71 P_ADDR: 3 MEM_ADDR: 16 ACC: 0 COMMAND: jmp [1]
-  DEBUG   control_unit:start         PC: 37 TICK: 72 P_ADDR: 1 MEM_ADDR: 16 ACC: 0 COMMAND: jz [4]
-  DEBUG   control_unit:start         PC: 38 TICK: 75 P_ADDR: 4 MEM_ADDR: 16 ACC: -1 COMMAND: halt []
+  DEBUG   control_unit:start         PC: 33 TICK: 67 P_ADDR: 3 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 100, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 34 TICK: 68 P_ADDR: 1 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 100, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 35 TICK: 69 P_ADDR: 2 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 100, 0, 0] COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 36 TICK: 71 P_ADDR: 3 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] COMMAND: jmp ['@1']
+  DEBUG   control_unit:start         PC: 37 TICK: 72 P_ADDR: 1 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] COMMAND: jz ['@4']
+  DEBUG   control_unit:start         PC: 38 TICK: 75 P_ADDR: 4 MEM_ADDR: 16 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0] COMMAND: halt []

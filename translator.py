@@ -106,7 +106,7 @@ def get_all_data(machine_code, index, data):
         names = list(dict_for_variable_names.keys())
         for i in names:
             new_index = dict_for_variable_names[i]
-            machine_code = re.sub(f'{i}', f'@{new_index}', machine_code)
+            machine_code = re.sub(f'"{i}"', f'"@{new_index}"', machine_code)
     else:
         machine_code = f"{machine_code[:-2]}]"
     return machine_code, index
@@ -130,7 +130,7 @@ def from_language_to_machine_code(program: str):
     # Заменяем все лейблы на адреса команд
     all_labels = list(labels.keys())
     for i in all_labels:
-        machine_code = re.sub(f'{i}', f"@{labels[i]}", machine_code)
+        machine_code = re.sub(f'"{i}"', f'"@{labels[i]}"', machine_code)
 
     print("source LoC:", lines_of_code, "code instr:", instr_count + 1)
     print("============================================================")

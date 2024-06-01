@@ -34,7 +34,12 @@ class Operation:
         try:
             self.perform(control_unit)
         except Exception:
-            print(f"Exception in command '{self.name}'")
+            raise Exception(f"Exception in command '{self.name}'")
+
+    def check_register(self, index):
+        reg = self.correct_arg(index)
+        if reg < 0 or reg > 12:
+            raise Exception(f"Incorrect register in command '{self.name}'")
 
     def perform(self, control_unit):
         return
@@ -48,6 +53,7 @@ class Mov(Operation):
     def perform(self, control_unit):
         if len(self.args) == 1:
             if "r" in self.args[0]:
+                self.check_register(0)
                 addr = self.correct_arg(0)
                 control_unit.data_path.set_left_register_address(addr)
             elif "@" in self.args[0]:
@@ -58,6 +64,7 @@ class Mov(Operation):
             control_unit.tick()
         elif len(self.args) == 2:
             if "r" in self.args[0]:
+                self.check_register(0)
                 addr = self.correct_arg(0)
                 control_unit.data_path.set_left_register_address(addr)
                 control_unit.tick()
@@ -70,6 +77,7 @@ class Mov(Operation):
                 addr = self.correct_arg(0)
                 control_unit.data_path.set_address(addr)
                 control_unit.tick()
+                self.check_register(1)
                 addr = self.correct_arg(1)
                 control_unit.data_path.set_left_register_address(addr)
                 control_unit.tick()
@@ -82,6 +90,7 @@ class Mov(Operation):
 class Inc(Operation):
     def perform(self, control_unit):
         if "r" in self.args[0]:
+            self.check_register(0)
             addr = self.correct_arg(0)
             control_unit.data_path.set_left_register_address(addr)
             control_unit.tick()
@@ -101,6 +110,7 @@ class Inc(Operation):
 class Dec(Operation):
     def perform(self, control_unit):
         if "r" in self.args[0]:
+            self.check_register(0)
             addr = self.correct_arg(0)
             control_unit.data_path.set_left_register_address(addr)
             control_unit.tick()
@@ -176,6 +186,8 @@ class Jl(Operation):
 class Cmp(Operation):
     def perform(self, control_unit):
         if len(self.args) == 2:
+            self.check_register(0)
+            self.check_register(1)
             addr_1 = self.correct_arg(0)
             addr_2 = self.correct_arg(1)
             control_unit.data_path.set_left_register_address(addr_1)
@@ -185,6 +197,8 @@ class Cmp(Operation):
             control_unit.data_path.write_value_to_register(0, -3, "==", None)
             control_unit.tick()
         elif len(self.args) == 4:
+            self.check_register(2)
+            self.check_register(3)
             mem_addr_1 = self.correct_arg(0)
             mem_addr_2 = self.correct_arg(1)
             reg_addr_1 = self.correct_arg(2)
@@ -210,6 +224,8 @@ class Cmp(Operation):
 class Add(Operation):
     def perform(self, control_unit):
         if len(self.args) >= 5:
+            self.check_register(-3)
+            self.check_register(-2)
             reg_addr_1 = self.correct_arg(-3)
             reg_addr_2 = self.correct_arg(-2)
             control_unit.data_path.set_left_register_address(reg_addr_1)
@@ -241,6 +257,8 @@ class Add(Operation):
 class Sub(Operation):
     def perform(self, control_unit):
         if len(self.args) >= 5:
+            self.check_register(-3)
+            self.check_register(-2)
             reg_addr_1 = self.correct_arg(-3)
             reg_addr_2 = self.correct_arg(-2)
             control_unit.data_path.set_left_register_address(reg_addr_1)
@@ -272,6 +290,8 @@ class Sub(Operation):
 class Mul(Operation):
     def perform(self, control_unit):
         if len(self.args) >= 5:
+            self.check_register(-3)
+            self.check_register(-2)
             reg_addr_1 = self.correct_arg(-3)
             reg_addr_2 = self.correct_arg(-2)
             control_unit.data_path.set_left_register_address(reg_addr_1)
@@ -303,6 +323,8 @@ class Mul(Operation):
 class Div(Operation):
     def perform(self, control_unit):
         if len(self.args) >= 5:
+            self.check_register(-3)
+            self.check_register(-2)
             reg_addr_1 = self.correct_arg(-3)
             reg_addr_2 = self.correct_arg(-2)
             control_unit.data_path.set_left_register_address(reg_addr_1)
@@ -334,6 +356,8 @@ class Div(Operation):
 class Rmd(Operation):
     def perform(self, control_unit):
         if len(self.args) == 3:
+            self.check_register(0)
+            self.check_register(1)
             addr_1 = self.correct_arg(0)
             addr_2 = self.correct_arg(1)
             control_unit.data_path.set_left_register_address(addr_1)
@@ -348,6 +372,8 @@ class Rmd(Operation):
             control_unit.data_path.write_value_to_memory(2, None, None, None)
             control_unit.tick()
         elif len(self.args) == 5:
+            self.check_register(2)
+            self.check_register(3)
             mem_addr_1 = self.correct_arg(0)
             mem_addr_2 = self.correct_arg(1)
             reg_addr_1 = self.correct_arg(2)

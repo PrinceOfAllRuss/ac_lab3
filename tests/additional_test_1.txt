@@ -4,23 +4,23 @@
     el3 3
     enter "$"
 .code:
-    add el1, el2, el3, 30
+    add el1 el2 el3 r0 r1 @30
     out 1 numb
     mov enter
     out 1 str
-    dec 30
+    dec @30
     out 1 numb
     mov enter
     out 1 str
-    sub el1, el2, el3, 31
+    sub el1 el2 el3 r0 r1 @31
     out 1 numb
     mov enter
     out 1 str
-    mul el1, el2, el3, 32
+    mul el1 el2 el3 r0 r1 @32
     out 1 numb
     mov enter
     out 1 str
-    div 30, 31, el1, 33
+    div @30 @31 el1 r0 r1 @33
     out 1 numb
     mov enter
     out 1 str

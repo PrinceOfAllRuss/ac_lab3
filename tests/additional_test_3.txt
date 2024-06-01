@@ -5,15 +5,15 @@
     b "B$"
     l "L$"
 .code:
-    cmp el1, el1
+    cmp el1, el1 r0 r1
     je equals
     jb bigger
     jl less
-    cmp el1, el2
+    cmp el1, el2 r3 r4
     je equals
     jb bigger
     jl less
-    cmp el2, el1
+    cmp el2, el1 r6 r7
     je equals
     jb bigger
     jl less
@@ -21,12 +21,12 @@
     equals:
         mov e
         out 1 str
-        jmp 4
+        jmp @4
     bigger:
         mov b
         out 1 str
-        jmp 12
+        jmp @12
     less:
         mov l
         out 1 str
-        jmp 8
+        jmp @8

@@ -39,5 +39,7 @@ if __name__ == "__main__":
     # translator.main("tests/cat.txt", "machine_code.txt")
     # main("machine_code.txt", "input_for_tests/input_for_test_cat.txt")
 
-    translator.main("tests/hello_user.txt", "machine_code.txt")
-    main("machine_code.txt", "input_for_tests/input_for_test_hello_user.txt")
+    # translator.main("tests/prob1.txt", "machine_code.txt")
+    # main("machine_code.txt", "input_for_tests/input_without_data.txt")
+    translator.main("tests/additional_test_1.txt", "machine_code.txt")
+    main("machine_code.txt", "input_for_tests/input_without_data.txt")

@@ -5,23 +5,23 @@ in_source: |-
     el3 3
     enter "$"
   .code:
-      add el1, el2, el3, 30
+      add el1 el2 el3 r0 r1 @30
       out 1 numb
       mov enter
       out 1 str
-      dec 30
+      dec @30
       out 1 numb
       mov enter
       out 1 str
-      sub el1, el2, el3, 31
+      sub el1 el2 el3 r0 r1 @31
       out 1 numb
       mov enter
       out 1 str
-      mul el1, el2, el3, 32
+      mul el1 el2 el3 r0 r1 @32
       out 1 numb
       mov enter
       out 1 str
-      div 30, 31, el1, 33
+      div @30 @31 el1 r0 r1 @33
       out 1 numb
       mov enter
       out 1 str
@@ -29,25 +29,25 @@ in_source: |-
 in_stdin: |-
   Fedor
 out_code: |-
-  [{"index": 0, "operation": "add", "arg": [21, 22, 23, 30]},
+  [{"index": 0, "operation": "add", "arg": ["@21", "@22", "@23", "r0", "r1", "@30"]},
   {"index": 1, "operation": "out", "arg": [1, "numb"]},
-  {"index": 2, "operation": "mov", "arg": [24]},
+  {"index": 2, "operation": "mov", "arg": ["@24"]},
   {"index": 3, "operation": "out", "arg": [1, "str"]},
-  {"index": 4, "operation": "dec", "arg": [30]},
+  {"index": 4, "operation": "dec", "arg": ["@30"]},
   {"index": 5, "operation": "out", "arg": [1, "numb"]},
-  {"index": 6, "operation": "mov", "arg": [24]},
+  {"index": 6, "operation": "mov", "arg": ["@24"]},
   {"index": 7, "operation": "out", "arg": [1, "str"]},
-  {"index": 8, "operation": "sub", "arg": [21, 22, 23, 31]},
+  {"index": 8, "operation": "sub", "arg": ["@21", "@22", "@23", "r0", "r1", "@31"]},
   {"index": 9, "operation": "out", "arg": [1, "numb"]},
-  {"index": 10, "operation": "mov", "arg": [24]},
+  {"index": 10, "operation": "mov", "arg": ["@24"]},
   {"index": 11, "operation": "out", "arg": [1, "str"]},
-  {"index": 12, "operation": "mul", "arg": [21, 22, 23, 32]},
+  {"index": 12, "operation": "mul", "arg": ["@21", "@22", "@23", "r0", "r1", "@32"]},
   {"index": 13, "operation": "out", "arg": [1, "numb"]},
-  {"index": 14, "operation": "mov", "arg": [24]},
+  {"index": 14, "operation": "mov", "arg": ["@24"]},
   {"index": 15, "operation": "out", "arg": [1, "str"]},
-  {"index": 16, "operation": "div", "arg": [30, 31, 21, 33]},
+  {"index": 16, "operation": "div", "arg": ["@30", "@31", "@21", "r0", "r1", "@33"]},
   {"index": 17, "operation": "out", "arg": [1, "numb"]},
-  {"index": 18, "operation": "mov", "arg": [24]},
+  {"index": 18, "operation": "mov", "arg": ["@24"]},
   {"index": 19, "operation": "out", "arg": [1, "str"]},
   {"index": 20, "operation": "halt"},
   {"index": 21, "data": 4},
@@ -65,34 +65,34 @@ out_stdout: |+
   -2.0
 
 out_log: |
-  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: -1 COMMAND: add [21, 22, 23, 30]
-  DEBUG   control_unit:start         PC: 1 TICK: 9 P_ADDR: 1 MEM_ADDR: 30 ACC: 9 COMMAND: out [1, 'numb']
+  DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: add ['@21', '@22', '@23', 'r0', 'r1', '@30']
+  DEBUG   control_unit:start         PC: 1 TICK: 11 P_ADDR: 1 MEM_ADDR: 30 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 1] COMMAND: out [1, 'numb']
   DEBUG   isa:perform_for_numb out: "" << "9"
-  DEBUG   control_unit:start         PC: 2 TICK: 12 P_ADDR: 2 MEM_ADDR: 30 ACC: 9 COMMAND: mov [24]
-  DEBUG   control_unit:start         PC: 3 TICK: 14 P_ADDR: 3 MEM_ADDR: 24 ACC: 9 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 2 TICK: 14 P_ADDR: 2 MEM_ADDR: 30 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 0, 1] COMMAND: mov ['@24']
+  DEBUG   control_unit:start         PC: 3 TICK: 16 P_ADDR: 3 MEM_ADDR: 24 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 0, 1] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "9" << "\n"
-  DEBUG   control_unit:start         PC: 4 TICK: 18 P_ADDR: 4 MEM_ADDR: 25 ACC: 10 COMMAND: dec [30]
-  DEBUG   control_unit:start         PC: 5 TICK: 22 P_ADDR: 5 MEM_ADDR: 30 ACC: 9 COMMAND: out [1, 'numb']
+  DEBUG   control_unit:start         PC: 4 TICK: 20 P_ADDR: 4 MEM_ADDR: 25 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: dec ['@30']
+  DEBUG   control_unit:start         PC: 5 TICK: 24 P_ADDR: 5 MEM_ADDR: 30 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: out [1, 'numb']
   DEBUG   isa:perform_for_numb out: "9\n" << "8"
-  DEBUG   control_unit:start         PC: 6 TICK: 25 P_ADDR: 6 MEM_ADDR: 30 ACC: 8 COMMAND: mov [24]
-  DEBUG   control_unit:start         PC: 7 TICK: 27 P_ADDR: 7 MEM_ADDR: 24 ACC: 8 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 6 TICK: 27 P_ADDR: 6 MEM_ADDR: 30 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 0, 1] COMMAND: mov ['@24']
+  DEBUG   control_unit:start         PC: 7 TICK: 29 P_ADDR: 7 MEM_ADDR: 24 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 0, 1] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "9\n8" << "\n"
-  DEBUG   control_unit:start         PC: 8 TICK: 31 P_ADDR: 8 MEM_ADDR: 25 ACC: 10 COMMAND: sub [21, 22, 23, 31]
-  DEBUG   control_unit:start         PC: 9 TICK: 40 P_ADDR: 9 MEM_ADDR: 31 ACC: -1 COMMAND: out [1, 'numb']
+  DEBUG   control_unit:start         PC: 8 TICK: 33 P_ADDR: 8 MEM_ADDR: 25 REGS: [9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: sub ['@21', '@22', '@23', 'r0', 'r1', '@31']
+  DEBUG   control_unit:start         PC: 9 TICK: 44 P_ADDR: 9 MEM_ADDR: 31 REGS: [-1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: out [1, 'numb']
   DEBUG   isa:perform_for_numb out: "9\n8\n" << "-1"
-  DEBUG   control_unit:start         PC: 10 TICK: 43 P_ADDR: 10 MEM_ADDR: 31 ACC: -1 COMMAND: mov [24]
-  DEBUG   control_unit:start         PC: 11 TICK: 45 P_ADDR: 11 MEM_ADDR: 24 ACC: -1 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 10 TICK: 47 P_ADDR: 10 MEM_ADDR: 31 REGS: [-1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 1] COMMAND: mov ['@24']
+  DEBUG   control_unit:start         PC: 11 TICK: 49 P_ADDR: 11 MEM_ADDR: 24 REGS: [-1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 1] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "9\n8\n-1" << "\n"
-  DEBUG   control_unit:start         PC: 12 TICK: 49 P_ADDR: 12 MEM_ADDR: 25 ACC: 10 COMMAND: mul [21, 22, 23, 32]
-  DEBUG   control_unit:start         PC: 13 TICK: 58 P_ADDR: 13 MEM_ADDR: 32 ACC: 24 COMMAND: out [1, 'numb']
+  DEBUG   control_unit:start         PC: 12 TICK: 53 P_ADDR: 12 MEM_ADDR: 25 REGS: [-1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: mul ['@21', '@22', '@23', 'r0', 'r1', '@32']
+  DEBUG   control_unit:start         PC: 13 TICK: 64 P_ADDR: 13 MEM_ADDR: 32 REGS: [24, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: out [1, 'numb']
   DEBUG   isa:perform_for_numb out: "9\n8\n-1\n" << "24"
-  DEBUG   control_unit:start         PC: 14 TICK: 61 P_ADDR: 14 MEM_ADDR: 32 ACC: 24 COMMAND: mov [24]
-  DEBUG   control_unit:start         PC: 15 TICK: 63 P_ADDR: 15 MEM_ADDR: 24 ACC: 24 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 14 TICK: 67 P_ADDR: 14 MEM_ADDR: 32 REGS: [24, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24, 0, 1] COMMAND: mov ['@24']
+  DEBUG   control_unit:start         PC: 15 TICK: 69 P_ADDR: 15 MEM_ADDR: 24 REGS: [24, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24, 0, 1] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "9\n8\n-1\n24" << "\n"
-  DEBUG   control_unit:start         PC: 16 TICK: 67 P_ADDR: 16 MEM_ADDR: 25 ACC: 10 COMMAND: div [30, 31, 21, 33]
-  DEBUG   control_unit:start         PC: 17 TICK: 76 P_ADDR: 17 MEM_ADDR: 33 ACC: -2.0 COMMAND: out [1, 'numb']
+  DEBUG   control_unit:start         PC: 16 TICK: 73 P_ADDR: 16 MEM_ADDR: 25 REGS: [24, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: div ['@30', '@31', '@21', 'r0', 'r1', '@33']
+  DEBUG   control_unit:start         PC: 17 TICK: 84 P_ADDR: 17 MEM_ADDR: 33 REGS: [-2.0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: out [1, 'numb']
   DEBUG   isa:perform_for_numb out: "9\n8\n-1\n24\n" << "-2.0"
-  DEBUG   control_unit:start         PC: 18 TICK: 79 P_ADDR: 18 MEM_ADDR: 33 ACC: -2.0 COMMAND: mov [24]
-  DEBUG   control_unit:start         PC: 19 TICK: 81 P_ADDR: 19 MEM_ADDR: 24 ACC: -2.0 COMMAND: out [1, 'str']
+  DEBUG   control_unit:start         PC: 18 TICK: 87 P_ADDR: 18 MEM_ADDR: 33 REGS: [-2.0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2.0, 0, 1] COMMAND: mov ['@24']
+  DEBUG   control_unit:start         PC: 19 TICK: 89 P_ADDR: 19 MEM_ADDR: 24 REGS: [-2.0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2.0, 0, 1] COMMAND: out [1, 'str']
   DEBUG   isa:correct_out   out: "9\n8\n-1\n24\n-2.0" << "\n"
-  DEBUG   control_unit:start         PC: 20 TICK: 85 P_ADDR: 20 MEM_ADDR: 25 ACC: 10 COMMAND: halt []
+  DEBUG   control_unit:start         PC: 20 TICK: 93 P_ADDR: 20 MEM_ADDR: 25 REGS: [-2.0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 0, 1] COMMAND: halt []
