@@ -33,10 +33,10 @@ def get_variable_name(data, i):
 
 def get_command_args(machine_code, index, data, j):
     new_el = re.sub(r",", "", data[j])
-    if re.search(r"[a-zA-Z]", new_el) is None:
-        machine_code += f"{new_el}"
-    else:
+    if not re.search(r"[a-zA-Z_@]+", new_el) is None:
         machine_code += f'"{new_el}"'
+    else:
+        machine_code += f'{new_el}'
 
     if j == len(data) - 1:
         machine_code += "]},\n"
@@ -102,11 +102,11 @@ def get_all_data(machine_code, index, data):
                 machine_code += "},\n"
             i += 2
 
-        # Заменяем все регистры на адреса в памяти
-        all_registers = list(dict_for_variable_names.keys())
-        for i in all_registers:
+        # Заменяем все названия переменных на адреса в памяти
+        names = list(dict_for_variable_names.keys())
+        for i in names:
             new_index = dict_for_variable_names[i]
-            machine_code = re.sub(f'"{i}"', f"{new_index}", machine_code)
+            machine_code = re.sub(f'{i}', f'@{new_index}', machine_code)
     else:
         machine_code = f"{machine_code[:-2]}]"
     return machine_code, index
@@ -130,7 +130,7 @@ def from_language_to_machine_code(program: str):
     # Заменяем все лейблы на адреса команд
     all_labels = list(labels.keys())
     for i in all_labels:
-        machine_code = re.sub(f'"{i}"', f"{labels[i]}", machine_code)
+        machine_code = re.sub(f'{i}', f"@{labels[i]}", machine_code)
 
     print("source LoC:", lines_of_code, "code instr:", instr_count + 1)
     print("============================================================")

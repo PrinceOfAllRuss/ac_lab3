@@ -1,6 +1,7 @@
 import logging
 import sys
-
+import re
+import translator
 from control_unit import ControlUnit
 from isa import from_machine_code_to_memory
 
@@ -28,6 +29,15 @@ def main(target, input_file):
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
-    _, code_file, input_file = sys.argv
-    main(code_file, input_file)
+    # assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
+    # _, code_file, input_file = sys.argv
+    # main(code_file, input_file)
+
+    # translator.main("tests/test.txt", "machine_code.txt")
+    # main("machine_code.txt", "input_for_tests/input_without_data.txt")
+
+    # translator.main("tests/cat.txt", "machine_code.txt")
+    # main("machine_code.txt", "input_for_tests/input_for_test_cat.txt")
+
+    translator.main("tests/hello_user.txt", "machine_code.txt")
+    main("machine_code.txt", "input_for_tests/input_for_test_hello_user.txt")

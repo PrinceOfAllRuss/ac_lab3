@@ -4,20 +4,20 @@
 .code:
     mov start
     loop_1:
-        jz 4
+        jz @4
         out 1 str
         jmp loop_1
-    in 0 55
+    in 0 @55
     loop_2:
-        jz 8
+        jz @8
         out 1 str
         jmp loop_2
     mov end
     loop_3:
-        jz 12
+        jz @12
         out 1 str
         jmp loop_3
-    mov 55
+    mov @55
     loop_4:
         jz break
         out 1 str

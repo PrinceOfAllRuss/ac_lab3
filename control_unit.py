@@ -12,7 +12,6 @@ class ControlUnit:
         self.program_counter = 0
         self.data_path = DataPath(memory, input_data)
         self.program_end_condition = False
-        self.out_condition_register = 1  # 0 - acc -> out, 1 - memory -> acc -> out
 
     def tick(self):
         self.tick_counter += 1
@@ -30,7 +29,7 @@ class ControlUnit:
                 operation: Operation = self.memory[self.address]
                 logging.debug(
                     f"PC: {self.program_counter} TICK: {self.tick_counter} P_ADDR: {self.address} "
-                    f"MEM_ADDR: {self.data_path.address} ACC: {self.data_path.acc} "
+                    f"MEM_ADDR: {self.data_path.address} REGS: {self.data_path.registers} "
                     f"COMMAND: {operation.name} {operation.args}"
                 )
                 if operation.name in opcode_keys:
