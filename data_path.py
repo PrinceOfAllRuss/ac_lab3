@@ -1,9 +1,10 @@
 class DataPath:
     def __init__(self, memory: [], input_data: []):
         self.address = 0
-        self.registers = [0] * 17
+        self.registers = [0] * 18
         self.registers[-3] = -2
         self.registers[-4] = 1  # 0 - reg -> out, 1 - memory -> reg -> out
+        self.registers[-5] = -1
         self.buffer = [input_data, []]
         self.memory = memory
 
@@ -14,7 +15,7 @@ class DataPath:
         self.registers[-2] = address
 
     def zero(self):
-        return self.registers[-3] == 0
+        return self.registers[-5] == 0
 
     def je_condition(self):
         return self.registers[-3] == 0
@@ -48,7 +49,7 @@ class DataPath:
 
     def write_value_to_register(self, sel, r_number, operation, port):
         if sel == -1:
-            self.registers[-3] = ord(self.buffer[port].pop())
+            self.registers[-5] = ord(self.buffer[port].pop())
         elif sel == 0:
             if r_number is None:
                 self.registers[self.registers[-2]] = self.perform_alu_operation(operation)
@@ -62,7 +63,7 @@ class DataPath:
             self.registers[self.registers[-1]] = self.memory[self.address]
 
     def out_register(self, translation_status, port):
-        out = self.registers[-3]
+        out = self.registers[-5]
         if translation_status:
             self.buffer[port].append(str(chr(out)))
         else:

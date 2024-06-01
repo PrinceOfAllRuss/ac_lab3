@@ -47,6 +47,7 @@ class Operation:
     def execute(self, control_unit):
         try:
             self.perform(control_unit)
+            control_unit.select_address(None)
         except Exception:
             raise CommandError(self.name) from Exception
 
@@ -86,8 +87,6 @@ class Lend(Operation):
             control_unit.data_path.write_value_to_register(1, addr, None, None)
             control_unit.tick()
 
-        control_unit.select_address(None)
-
 
 class Mov(Operation):
     def perform(self, control_unit):
@@ -101,8 +100,6 @@ class Mov(Operation):
         else:
             raise ValueError("Invalid")
         control_unit.tick()
-
-        control_unit.select_address(None)
 
 
 class Inc(Operation):
@@ -122,7 +119,6 @@ class Inc(Operation):
             control_unit.tick()
             control_unit.data_path.write_value_to_memory(0, None, "inc", None)
             control_unit.tick()
-        control_unit.select_address(None)
 
 
 class Dec(Operation):
@@ -142,28 +138,45 @@ class Dec(Operation):
             control_unit.tick()
             control_unit.data_path.write_value_to_memory(0, None, "dec", None)
             control_unit.tick()
-        control_unit.select_address(None)
 
 
 class Jmp(Operation):
+    def execute(self, control_unit):
+        try:
+            self.perform(control_unit)
+        except Exception:
+            raise CommandError(self.name) from Exception
+
     def perform(self, control_unit):
         next_operation_address = self.correct_arg(0)
         control_unit.select_address(next_operation_address)
 
 
 class Jz(Operation):
+    def execute(self, control_unit):
+        try:
+            self.perform(control_unit)
+        except Exception:
+            raise CommandError(self.name) from Exception
+
     def perform(self, control_unit):
         if control_unit.data_path.zero():
             next_operation_address = self.correct_arg(0)
             control_unit.select_address(next_operation_address)
             control_unit.tick()
-            control_unit.data_path.write_value_to_register(0, -3, "dec", None)
+            control_unit.data_path.write_value_to_register(0, -5, "dec", None)
             control_unit.tick()
         else:
             control_unit.select_address(None)
 
 
 class Je(Operation):
+    def execute(self, control_unit):
+        try:
+            self.perform(control_unit)
+        except Exception:
+            raise CommandError(self.name) from Exception
+
     def perform(self, control_unit):
         if control_unit.data_path.je_condition():
             next_operation_address = self.correct_arg(0)
@@ -178,6 +191,12 @@ class Je(Operation):
 
 
 class Jb(Operation):
+    def execute(self, control_unit):
+        try:
+            self.perform(control_unit)
+        except Exception:
+            raise CommandError(self.name) from Exception
+
     def perform(self, control_unit):
         if control_unit.data_path.jb_condition():
             next_operation_address = self.correct_arg(0)
@@ -190,6 +209,12 @@ class Jb(Operation):
 
 
 class Jl(Operation):
+    def execute(self, control_unit):
+        try:
+            self.perform(control_unit)
+        except Exception:
+            raise CommandError(self.name) from Exception
+
     def perform(self, control_unit):
         if control_unit.data_path.jl_condition():
             next_operation_address = self.correct_arg(0)
@@ -236,8 +261,6 @@ class Cmp(Operation):
             control_unit.data_path.write_value_to_register(0, -3, "==", None)
             control_unit.tick()
 
-        control_unit.select_address(None)
-
 
 class Add(Operation):
     def perform(self, control_unit):
@@ -268,8 +291,6 @@ class Add(Operation):
             mem_addr_result = self.correct_arg(-1)
             control_unit.data_path.set_address(mem_addr_result)
             control_unit.data_path.write_value_to_memory(2, None, None, None)
-
-        control_unit.select_address(None)
 
 
 class Sub(Operation):
@@ -302,8 +323,6 @@ class Sub(Operation):
             control_unit.data_path.set_address(mem_addr_result)
             control_unit.data_path.write_value_to_memory(2, None, None, None)
 
-        control_unit.select_address(None)
-
 
 class Mul(Operation):
     def perform(self, control_unit):
@@ -335,8 +354,6 @@ class Mul(Operation):
             control_unit.data_path.set_address(mem_addr_result)
             control_unit.data_path.write_value_to_memory(2, None, None, None)
 
-        control_unit.select_address(None)
-
 
 class Div(Operation):
     def perform(self, control_unit):
@@ -367,8 +384,6 @@ class Div(Operation):
             mem_addr_result = self.correct_arg(-1)
             control_unit.data_path.set_address(mem_addr_result)
             control_unit.data_path.write_value_to_memory(2, None, None, None)
-
-        control_unit.select_address(None)
 
 
 class Rmd(Operation):
@@ -416,8 +431,6 @@ class Rmd(Operation):
             control_unit.data_path.write_value_to_memory(2, None, None, None)
             control_unit.tick()
 
-        control_unit.select_address(None)
-
 
 class In(Operation):
     def perform(self, control_unit):
@@ -432,16 +445,16 @@ class In(Operation):
             while not control_unit.data_path.zero():
                 control_unit.data_path.write_value_to_memory(-1, None, None, port)
                 control_unit.tick()
-                control_unit.data_path.write_value_to_register(1, -3, None, None)
+                control_unit.data_path.write_value_to_register(1, -5, None, None)
                 control_unit.tick()
-                if control_unit.data_path.registers[-3] == 10:
+                if control_unit.data_path.registers[-5] == 10:
                     enter = "\\n"
                     logging.debug(f'input: "{enter}"')
-                elif control_unit.data_path.registers[-3] != 0:
-                    logging.debug(f'input: "{chr(control_unit.data_path.registers[-3])}"')
+                elif control_unit.data_path.registers[-5] != 0:
+                    logging.debug(f'input: "{chr(control_unit.data_path.registers[-5])}"')
                 control_unit.data_path.inc_address()
                 control_unit.tick()
-            control_unit.data_path.write_value_to_register(0, -3, "dec", None)
+            control_unit.data_path.write_value_to_register(0, -5, "dec", None)
             control_unit.data_path.set_address(addr)
             control_unit.tick()
         else:
@@ -450,13 +463,11 @@ class In(Operation):
             control_unit.tick()
             control_unit.data_path.write_value_to_register(-1, None, None, port)
             control_unit.tick()
-            if control_unit.data_path.registers[-3] == 10:
+            if control_unit.data_path.registers[-5] == 10:
                 enter = "\\n"
                 logging.debug(f'input: "{enter}"')
-            elif control_unit.data_path.registers[-3] != 0:
-                logging.debug(f'input: "{chr(control_unit.data_path.registers[-3])}"')
-
-        control_unit.select_address(None)
+            elif control_unit.data_path.registers[-5] != 0:
+                logging.debug(f'input: "{chr(control_unit.data_path.registers[-5])}"')
 
 
 class Out(Operation):
@@ -469,23 +480,20 @@ class Out(Operation):
             self.perform_for_numb(control_unit, output, port)
         elif el_type == "str":
             self.perform_for_str(control_unit, output, port)
-        control_unit.select_address(None)
 
     def perform_for_numb(self, control_unit, output, port):
         if control_unit.data_path.registers[-4] == 0:
-            if not control_unit.data_path.zero():
-                logging.debug(f'out: "{output}" << "{control_unit.data_path.registers[-3]}"')
-                control_unit.data_path.out_register(False, port)
-                control_unit.tick()
+            logging.debug(f'out: "{output}" << "{control_unit.data_path.registers[-5]}"')
+            control_unit.data_path.out_register(False, port)
+            control_unit.tick()
             control_unit.data_path.write_value_to_register(0, -4, "1", None)
             control_unit.tick()
         elif control_unit.data_path.registers[-4] == 1:
-            control_unit.data_path.write_value_to_register(1, -3, None, None)
+            control_unit.data_path.write_value_to_register(1, -5, None, None)
             control_unit.tick()
-            if not control_unit.data_path.zero():
-                logging.debug(f'out: "{output}" << "{control_unit.data_path.registers[-3]}"')
-                control_unit.data_path.out_register(False, port)
-                control_unit.tick()
+            logging.debug(f'out: "{output}" << "{control_unit.data_path.registers[-5]}"')
+            control_unit.data_path.out_register(False, port)
+            control_unit.tick()
 
     def perform_for_str(self, control_unit, output, port):
         if control_unit.data_path.registers[-4] == 0:
@@ -496,7 +504,7 @@ class Out(Operation):
             control_unit.data_path.write_value_to_register(0, -4, "1", None)
             control_unit.tick()
         elif control_unit.data_path.registers[-4] == 1:
-            control_unit.data_path.write_value_to_register(1, -3, None, None)
+            control_unit.data_path.write_value_to_register(1, -5, None, None)
             control_unit.tick()
             if not control_unit.data_path.zero():
                 self.correct_out(output, control_unit)
@@ -506,11 +514,11 @@ class Out(Operation):
                 control_unit.tick()
 
     def correct_out(self, output, control_unit):
-        if control_unit.data_path.registers[-3] == 10:
+        if control_unit.data_path.registers[-5] == 10:
             enter = "\\n"
             logging.debug(f'out: "{output}" << "{enter}"')
-        elif control_unit.data_path.registers[-3] != 0:
-            logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.registers[-3])}"')
+        elif control_unit.data_path.registers[-5] != 0:
+            logging.debug(f'out: "{output}" << "{chr(control_unit.data_path.registers[-5])}"')
 
 
 class Halt(Operation):

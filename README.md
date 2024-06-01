@@ -88,16 +88,18 @@
 | ...                          |
 | r12                          |
 | or                           |
+| oc                           |
 | jr                           |
 | lr                           |
 | rr                           |
 +------------------------------+
 
 Регистры `r0-r12` доступные программисту
-`or` -- `r13`, хранит условие вывода: 0 - делаем вывод из регистра, адрес которого лежит в `lr`, 1 - загружаем значение из памяти в `lr`, а потом это значение выводим
-`jr` -- `r14`, хранит условие перехода для команд `jz`, `je`, `jl`, `jb`
-`lr` -- `r15`, хранит адрес регистра, который подается на левый вход в алу
-`rr` -- `r16`, хранит адрес регистра, который подается на правый вход в алу
+`or` -- `r13`, хранит элемент, который подлежит выводу
+`oc` -- `r14`, хранит условие вывода: 0 - делаем вывод из регистра, адрес которого лежит в `lr`, 1 - загружаем значение из памяти в `lr`, а потом это значение выводим
+`jr` -- `r15`, хранит условие перехода для команд `jz`, `je`, `jl`, `jb`
+`lr` -- `r16`, хранит адрес регистра, который подается на левый вход в алу
+`rr` -- `r17`, хранит адрес регистра, который подается на правый вход в алу
 
   Instruction and data memory
 +------------------------------+
@@ -122,38 +124,58 @@
 Особенности процессора:
 
 - Машинное слово -- не определено (CISC архитектура).
-- Доступ к памяти данных осуществляется по адресу, хранящемуся в специальном регистре `data_address`. 
+- Доступ к памяти для получения данных осуществляется по адресу, хранящемуся в специальном регистре `data_address`. 
 - Доступ к текущей инструкции осуществляется по адресу, хранящемуся в специальном регистре `program_address`.
-- Напрямую установка адреса недоступна, осуществляется неявно внутри команд операторов, команд переходов и внутри команд загрузки, выгрузки памяти.
+- Доступна прямая и неявная установка адреса:
+  - Прямая установка адреса доступна при помощи команд `jmp`, `jz`, `je`, `jl`, `jb`, `mov`
+  - Неявная установка адреса осуществляется внутри команд операторов, команд переходов и внутри команд загрузки, выгрузки памяти.
 - Обработка данных происходит при помощи операторов `inc`, `dec`, `add`, `sub`, `mul`, `div`, `rmd`
 - Поток управления:
     - инкремент `pc` после каждой инструкции;
     - условный (`jz`, `je`, `jb`, `jl`) и безусловный (`jmp`, `mov`) переходы
-    - `counter` для выполнения команд требующих больше одного такта  
+    - `step_counter` для выполнения команд требующих больше одного такта  
 - Устройства ввода вывода используется при помощи портов
     - Для доступа к устройству вывода используется команда `out { port, type }`
     - Для доступа к устройству ввода используется команда `in { port }`, `in { port, address }`
 
 Набор инструкций:
 
+- `lend { address, register }` -- загрузить элемент из указанной ячейки памяти в указанный регистр
+- `lend { register, address }` -- загрузить элемент из указанного регистра в указанную ячейку памяти
 - `mov { address }` -- безусловный переход по заданному адресу (используется для DataPath)
-- `mov { el1_addr, el2_addr, address }` -- поменять местами два элемента, используя промежуточный адрес
-- `inc` -- увеличить значение в текущей ячейке на 1
-- `dec` -- уменьшить значение в текущей ячейке на 1
-- `add { el1_addr, el2_addr, address }` -- сложить произвольное количество элементов из памяти и положить в ячейку по указанному адресу (элементы берутся слева направо)
-- `sub { el1_addr, el2_addr, address }` -- вычесть произвольное количество элементов из памяти и положить в ячейку по указанному адресу (элементы берутся слева направо)
-- `mul { el1_addr, el2_addr, address }` -- перемножить произвольное количество элементов из памяти и положить в ячейку по указанному адресу (элементы берутся слева направо)
-- `div { el1_addr, el2_addr, address }` -- поделить произвольное количество элементов из памяти и положить в ячейку по указанному адресу (элементы берутся слева направо)
-- `rmd { el1_addr, el2_addr, address }` -- найти остаток от деления el1 на el2 и положить в ячейку по указанному адресу
-- `cmp { el1_addr, el2_addr }` -- сравнить два элемента из памяти
-- `jmp { address }` -- безусловный переход по заданному адресу или метке (используется для ControlUnit)
-- `jz { address }` -- условный переход по заданному адресу или метке, если значение аккумулятора равно ноль
-- `je { address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент равен второму элементу
-- `jb { address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент больше второго элемента
-- `jl { address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент меньше второго элемента
-- `in { port }` -- ввести извне значение и сохранить в аккумулятор (символ)
-- `in { port, address }` -- ввести извне значение и сохранить в память начиная с текущей ячейки (последовательность символов)
-- `out { port, type }` -- напечатать значение из текущей ячейки (символ)
+- `mov { register }` -- установить адрес регистра, который будет подаваться на левый вход алу (используется для DataPath)
+- `inc { address }` -- увеличить значение в указанной ячейке памяти на 1
+- `inc { register }` -- увеличить значение в указанном регистре на 1
+- `dec { address }` -- уменьшить значение в указанной ячейке памяти на 1
+- `dec { register }` -- уменьшить значение в указанном регистре на 1
+- `add { el1_addr, el2_addr, reg_1, reg_2, address }` -- сложить произвольное количество элементов из памяти и положить в ячейку по указанному адресу; 
+элементы берутся слева направо и складываются в указанные регистры; каждый результат вычисления складывается в регистр `reg_1`; 
+каждый следующий элемент складывается в регистр `reg_2`; конечный результат вычислений из регистра `reg_1` записывается в ячейку с адресом `address`
+- `sub { el1_addr, el2_addr, reg_1, reg_2, address }` -- вычесть произвольное количество элементов из памяти и положить в ячейку по указанному адресу; 
+элементы берутся слева направо и складываются в указанные регистры; каждый результат вычисления складывается в регистр `reg_1`; 
+каждый следующий элемент складывается в регистр `reg_2`; конечный результат вычислений из регистра `reg_1` записывается в ячейку с адресом `address`
+- `mul { el1_addr, el2_addr, reg_1, reg_2, address }` -- перемножить произвольное количество элементов из памяти и положить в ячейку по указанному адресу; 
+элементы берутся слева направо и складываются в указанные регистры; каждый результат вычисления складывается в регистр `reg_1`; 
+каждый следующий элемент складывается в регистр `reg_2`; конечный результат вычислений из регистра `reg_1` записывается в ячейку с адресом `address`
+- `div { el1_addr, el2_addr, reg_1, reg_2, address }` -- поделить произвольное количество элементов из памяти и положить в ячейку по указанному адресу; 
+элементы берутся слева направо и складываются в указанные регистры; каждый результат вычисления складывается в регистр `reg_1`; 
+каждый следующий элемент складывается в регистр `reg_2`; конечный результат вычислений из регистра `reg_1` записывается в ячейку с адресом `address`
+- `rmd { reg_1, reg_2, address }` -- найти остаток от деления значений из `reg_1` и `reg_2` и положить в ячейку по адресу `address`
+- `rmd { el1_addr, el2_addr, reg_1, reg_2, address }` -- найти остаток от деления el1 на el2 и положить в ячейку по указанному адресу;
+элементы берутся слева направо и складываются в указанные регистры; результат вычисления складывается в регистр `reg_1`, 
+а после записывается в ячейку с адресом `address`
+- `cmp { reg_1, reg_2 }` -- сравнить два значения из указанных регистров
+- `cmp { el1_addr, el2_addr, reg_1, reg_2 }` -- сравнить два значения из памяти; элементы берутся слева направо и складываются в указанные регистры, 
+далее сравниваются два значения в указанных регистрах
+- `jmp { lable | address }` -- безусловный переход по заданному адресу или метке (используется для ControlUnit)
+- `jz { lable | address }` -- условный переход по заданному адресу или метке, если регистр `jr` равен ноль
+- `je { lable | address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент равен второму элементу
+- `jb { lable | address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент больше второго элемента
+- `jl { lable | address }` -- условный переход по заданному адресу или метке, если в команде `cmp` первый элемент меньше второго элемента
+- `in { port }` -- ввести извне значение и сохранить в `or` (символ)
+- `in { port, address }` -- ввести извне значение и сохранить в память начиная с указанной ячейки (последовательность символов)
+- `out { port, type }` -- напечатать значение из текущей ячейки (символ), предварительно загрузив его в `or`, или 
+напечатать текущее значение `or` (условие выбора алгоритма хранится в `oc`)
 - `halt` -- завершить выполнение программы
 
 ### Кодирование инструкций
@@ -169,7 +191,7 @@
   {
     "index": 0, 
     "operation": "add", 
-    "arg": [21, 22, 23, 30]
+    "arg": ["@21", "@22", "@23", "r0", "r1", "@30"]
   }
 ]
 ```
@@ -177,7 +199,7 @@
 где:
 - `index` -- адрес ячейки в памяти
 - `operation` -- строка с кодом операции;
-- `arg` -- аргумент (может отсутствовать);
+- `arg` -- аргумент (может отсутствовать, может быть несколько);
 
 ## Транслятор
 
@@ -187,9 +209,9 @@
 
 Этапы трансляции (функция `main`):
 
-1. Очистка комментариев и лишних пробелов
-2. Генерация машинного кода без адресов переходов
-3. Подстановка меток перехода в инструкции.
+1. Избавление от комментариев и лишних пробелов
+2. Генерация машинного кода без адресов перехода, без адресов переменных
+3. Подстановка адресов перехода и адресов переменных в инструкции
 
 ## Модель процессора
 
@@ -208,7 +230,7 @@
 Сигналы (обрабатываются за один такт, реализованы в виде методов класса):
 
 - `latch_addr` -- защёлкнуть выбранное значение в `data_addr`;
-- `latch_acc` -- защёлкнуть в аккумулятор выбранное значение;
+- `latch_reg_n` -- защёлкнуть в n-ый регистр выбранное значение;
   - выход из памяти
   - результат операции в алу
   - значение из порта ввода 
@@ -216,7 +238,8 @@
   - выход из аккумулятора
   - результат операции в алу
   - значение из порта ввода
-- `signal_output` -- записать аккумулятор в порт вывода.
+- `ot` -- вывести значение из памяти;
+- `signal_output` -- записать регистр `or` в порт вывода.
   - Строкой
   - Числом
 
@@ -234,7 +257,6 @@
 Реализован в классе [ControlUnit](./control_unit.py)
 
 - `program_address` - регистр указатель на исполняемую инструкцию в памяти
-- `out_register` - регистр, содержащий условие для выполнения команды `out`
 
 - Hardwired (реализовано полностью на Python).
 - Метод `start` моделирует выполнение полного цикла инструкции.
@@ -245,7 +267,6 @@
 - `latch_program_address` -- сигнал для обновления счётчика команд в ControlUnit.
   - +1
   - адрес из команды
-- `latch_or` -- сигнал для обновления значения в `out_register`
 
 Особенности работы модели:
 
@@ -255,8 +276,8 @@
 - Количество инструкций для моделирования лимитировано (10000).
 - Остановка моделирования осуществляется при:
     - превышении лимита количества выполняемых инструкций;
-    - превышении лимита памяти
-    - при превышении лимита в ячейке памяти
+    - превышении лимита памяти;
+    - при помощи команды `halt`
 
 ## Тестирование
 
@@ -359,94 +380,94 @@ a
 b
 c
 Hello
-(.venv) PS D:\2_year\2_half\AC\lab3> python ./translator.py .\tests\hello_user.txt .\machine_code.txt
+(.venv) PS D:\2_year\2_half\AC\lab3> python ./translator.py .\tests\cat.txt .\machine_code.txt
 source LoC: 8 code instr: 5
 ============================================================
 (.venv) PS D:\2_year\2_half\AC\lab3> cat .\machine_code.txt
-[{"index": 0, "operation": "jz", "arg": [4]},
+[{"index": 0, "operation": "jz", "arg": ["@4"]},
 {"index": 1, "operation": "in", "arg": [0]},
 {"index": 2, "operation": "out", "arg": [1, "str"]},
-{"index": 3, "operation": "jmp", "arg": [0]},
+{"index": 3, "operation": "jmp", "arg": ["@0"]},
 {"index": 4, "operation": "halt"}]
 (.venv) PS D:\2_year\2_half\AC\lab3> python .\machine.py .\tests\cat.txt .\input_for_tests\input_for_test_cat.txt
-DEBUG   control_unit:start         PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 1 TICK: 1 P_ADDR: 1 MEM_ADDR: 0 ACC: 0 COMMAND: in [0]
-DEBUG   isa:perform       input: "a"
-DEBUG   control_unit:start         PC: 2 TICK: 3 P_ADDR: 2 MEM_ADDR: 0 ACC: 97 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "" << "a"
-DEBUG   control_unit:start         PC: 3 TICK: 5 P_ADDR: 3 MEM_ADDR: 0 ACC: 97 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 4 TICK: 6 P_ADDR: 0 MEM_ADDR: 0 ACC: 97 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 5 TICK: 7 P_ADDR: 1 MEM_ADDR: 0 ACC: 97 COMMAND: in [0]
-DEBUG   isa:perform       input: "\n"
-DEBUG   control_unit:start         PC: 6 TICK: 9 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a" << "\n"
-DEBUG   control_unit:start         PC: 7 TICK: 11 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 8 TICK: 12 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 9 TICK: 13 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
-DEBUG   isa:perform       input: "b"
-DEBUG   control_unit:start         PC: 10 TICK: 15 P_ADDR: 2 MEM_ADDR: 0 ACC: 98 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\n" << "b"
-DEBUG   control_unit:start         PC: 11 TICK: 17 P_ADDR: 3 MEM_ADDR: 0 ACC: 98 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 12 TICK: 18 P_ADDR: 0 MEM_ADDR: 0 ACC: 98 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 13 TICK: 19 P_ADDR: 1 MEM_ADDR: 0 ACC: 98 COMMAND: in [0]
-DEBUG   isa:perform       input: "\n"
-DEBUG   control_unit:start         PC: 14 TICK: 21 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb" << "\n"
-DEBUG   control_unit:start         PC: 15 TICK: 23 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 16 TICK: 24 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 17 TICK: 25 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
-DEBUG   isa:perform       input: "c"
-DEBUG   control_unit:start         PC: 18 TICK: 27 P_ADDR: 2 MEM_ADDR: 0 ACC: 99 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\n" << "c"
-DEBUG   control_unit:start         PC: 19 TICK: 29 P_ADDR: 3 MEM_ADDR: 0 ACC: 99 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 20 TICK: 30 P_ADDR: 0 MEM_ADDR: 0 ACC: 99 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 21 TICK: 31 P_ADDR: 1 MEM_ADDR: 0 ACC: 99 COMMAND: in [0]
-DEBUG   isa:perform       input: "\n"
-DEBUG   control_unit:start         PC: 22 TICK: 33 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc" << "\n"
-DEBUG   control_unit:start         PC: 23 TICK: 35 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 24 TICK: 36 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 25 TICK: 37 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
-DEBUG   isa:perform       input: "H"
-DEBUG   control_unit:start         PC: 26 TICK: 39 P_ADDR: 2 MEM_ADDR: 0 ACC: 72 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\n" << "H"
-DEBUG   control_unit:start         PC: 27 TICK: 41 P_ADDR: 3 MEM_ADDR: 0 ACC: 72 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 28 TICK: 42 P_ADDR: 0 MEM_ADDR: 0 ACC: 72 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 29 TICK: 43 P_ADDR: 1 MEM_ADDR: 0 ACC: 72 COMMAND: in [0]
-DEBUG   isa:perform       input: "e"
-DEBUG   control_unit:start         PC: 30 TICK: 45 P_ADDR: 2 MEM_ADDR: 0 ACC: 101 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\nH" << "e"
-DEBUG   control_unit:start         PC: 31 TICK: 47 P_ADDR: 3 MEM_ADDR: 0 ACC: 101 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 32 TICK: 48 P_ADDR: 0 MEM_ADDR: 0 ACC: 101 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 33 TICK: 49 P_ADDR: 1 MEM_ADDR: 0 ACC: 101 COMMAND: in [0]
-DEBUG   isa:perform       input: "l"
-DEBUG   control_unit:start         PC: 34 TICK: 51 P_ADDR: 2 MEM_ADDR: 0 ACC: 108 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\nHe" << "l"
-DEBUG   control_unit:start         PC: 35 TICK: 53 P_ADDR: 3 MEM_ADDR: 0 ACC: 108 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 36 TICK: 54 P_ADDR: 0 MEM_ADDR: 0 ACC: 108 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 37 TICK: 55 P_ADDR: 1 MEM_ADDR: 0 ACC: 108 COMMAND: in [0]
-DEBUG   isa:perform       input: "l"
-DEBUG   control_unit:start         PC: 38 TICK: 57 P_ADDR: 2 MEM_ADDR: 0 ACC: 108 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\nHel" << "l"
-DEBUG   control_unit:start         PC: 39 TICK: 59 P_ADDR: 3 MEM_ADDR: 0 ACC: 108 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 40 TICK: 60 P_ADDR: 0 MEM_ADDR: 0 ACC: 108 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 41 TICK: 61 P_ADDR: 1 MEM_ADDR: 0 ACC: 108 COMMAND: in [0]
-DEBUG   isa:perform       input: "o"
-DEBUG   control_unit:start         PC: 42 TICK: 63 P_ADDR: 2 MEM_ADDR: 0 ACC: 111 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\nHell" << "o"
-DEBUG   control_unit:start         PC: 43 TICK: 65 P_ADDR: 3 MEM_ADDR: 0 ACC: 111 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 44 TICK: 66 P_ADDR: 0 MEM_ADDR: 0 ACC: 111 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 45 TICK: 67 P_ADDR: 1 MEM_ADDR: 0 ACC: 111 COMMAND: in [0]
-DEBUG   isa:perform       input: "\n"
-DEBUG   control_unit:start         PC: 46 TICK: 69 P_ADDR: 2 MEM_ADDR: 0 ACC: 10 COMMAND: out [1, 'str']
-DEBUG   isa:perform       out: "a\nb\nc\nHello" << "\n"
-DEBUG   control_unit:start         PC: 47 TICK: 71 P_ADDR: 3 MEM_ADDR: 0 ACC: 10 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 48 TICK: 72 P_ADDR: 0 MEM_ADDR: 0 ACC: 10 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 49 TICK: 73 P_ADDR: 1 MEM_ADDR: 0 ACC: 10 COMMAND: in [0]
-DEBUG   control_unit:start         PC: 50 TICK: 75 P_ADDR: 2 MEM_ADDR: 0 ACC: 0 COMMAND: out [1, 'str']
-DEBUG   control_unit:start         PC: 51 TICK: 77 P_ADDR: 3 MEM_ADDR: 0 ACC: 0 COMMAND: jmp [0]
-DEBUG   control_unit:start         PC: 52 TICK: 78 P_ADDR: 0 MEM_ADDR: 0 ACC: 0 COMMAND: jz [4]
-DEBUG   control_unit:start         PC: 53 TICK: 80 P_ADDR: 4 MEM_ADDR: 0 ACC: 0 COMMAND: halt []
+DEBUG:root:PC: 0 TICK: 0 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 1 TICK: 1 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "a"
+DEBUG:root:PC: 2 TICK: 4 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "" << "a"
+DEBUG:root:PC: 3 TICK: 7 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 4 TICK: 8 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 5 TICK: 9 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "\n"
+DEBUG:root:PC: 6 TICK: 12 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a" << "\n"
+DEBUG:root:PC: 7 TICK: 15 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 8 TICK: 16 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 9 TICK: 17 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "b"
+DEBUG:root:PC: 10 TICK: 20 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 98, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\n" << "b"
+DEBUG:root:PC: 11 TICK: 23 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 98, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 12 TICK: 24 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 98, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 13 TICK: 25 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 98, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "\n"
+DEBUG:root:PC: 14 TICK: 28 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb" << "\n"
+DEBUG:root:PC: 15 TICK: 31 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 16 TICK: 32 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 17 TICK: 33 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "c"
+DEBUG:root:PC: 18 TICK: 36 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\n" << "c"
+DEBUG:root:PC: 19 TICK: 39 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 20 TICK: 40 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 21 TICK: 41 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "\n"
+DEBUG:root:PC: 22 TICK: 44 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc" << "\n"
+DEBUG:root:PC: 23 TICK: 47 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 24 TICK: 48 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 25 TICK: 49 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "H"
+DEBUG:root:PC: 26 TICK: 52 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\n" << "H"
+DEBUG:root:PC: 27 TICK: 55 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 28 TICK: 56 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 29 TICK: 57 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "e"
+DEBUG:root:PC: 30 TICK: 60 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\nH" << "e"
+DEBUG:root:PC: 31 TICK: 63 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 32 TICK: 64 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 33 TICK: 65 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "l"
+DEBUG:root:PC: 34 TICK: 68 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\nHe" << "l"
+DEBUG:root:PC: 35 TICK: 71 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 36 TICK: 72 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 37 TICK: 73 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "l"
+DEBUG:root:PC: 38 TICK: 76 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\nHel" << "l"
+DEBUG:root:PC: 39 TICK: 79 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 40 TICK: 80 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 41 TICK: 81 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "o"
+DEBUG:root:PC: 42 TICK: 84 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\nHell" << "o"
+DEBUG:root:PC: 43 TICK: 87 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 44 TICK: 88 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 45 TICK: 89 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 111, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:input: "\n"
+DEBUG:root:PC: 46 TICK: 92 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:out: "a\nb\nc\nHello" << "\n"
+DEBUG:root:PC: 47 TICK: 95 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 48 TICK: 96 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 49 TICK: 97 P_ADDR: 1 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 1, -2, 0, 0] COMMAND: in [0]
+DEBUG:root:PC: 50 TICK: 100 P_ADDR: 2 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0] COMMAND: out [1, 'str']
+DEBUG:root:PC: 51 TICK: 102 P_ADDR: 3 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: jmp ['@0']
+DEBUG:root:PC: 52 TICK: 103 P_ADDR: 0 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -2, 0, 0] COMMAND: jz ['@4']
+DEBUG:root:PC: 53 TICK: 106 P_ADDR: 4 MEM_ADDR: 0 REGS: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -2, 0, 0] COMMAND: halt []
 ```
 
 Пример проверки исходного кода:
@@ -473,8 +494,8 @@ golden_test.py::test_translator_and_machine[golden/prob1.yml] PASSED            
 
 ```text
 | ФИО                     | алг        | LoC  | code байт | code инстр. | инстр.    | такт.    | вариант |
-| Филатов Фёдор Романович | cat        | 8    | -         | 5           | 53        | 80       | -       |
-| Филатов Фёдор Романович | hello      | 10   | -         | 5           | 38        | 74       | -       |
-| Филатов Фёдор Романович | hello_user | 26   | -         | 17          | 152       | 310      | -       |
-| Филатов Фёдор Романович | prob1      | 28   | -         | 16          | 9461      | 36374    | -       |
+| Филатов Фёдор Романович | cat        | 8    | -         | 5           | 53        | 106      | -       |
+| Филатов Фёдор Романович | hello      | 10   | -         | 5           | 38        | 75       | -       |
+| Филатов Фёдор Романович | hello_user | 26   | -         | 17          | 152       | 323      | -       |
+| Филатов Фёдор Романович | prob1      | 28   | -         | 16          | 9461      | 50764    | -       |
 ```
