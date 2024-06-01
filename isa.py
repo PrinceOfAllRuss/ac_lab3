@@ -2,6 +2,20 @@ import json
 import logging
 
 
+class CommandError(Exception):
+    def __init__(self, *args):
+        if args:
+            self.message = args[0]
+        else:
+            self.message = None
+
+    def __str__(self):
+        new_message = "CommandError has been raised"
+        if self.message:
+            new_message = f"CommandError, error in command {self.message} "
+        return new_message
+
+
 def from_machine_code_to_memory(target, memory_size):
     f = open(target)
     machine_code = f.read()
@@ -34,12 +48,12 @@ class Operation:
         try:
             self.perform(control_unit)
         except Exception:
-            raise Exception(f"Exception in command '{self.name}'")
+            raise CommandError(self.name) from Exception
 
     def check_register(self, index):
         reg = self.correct_arg(index)
         if reg < 0 or reg > 12:
-            raise Exception(f"Incorrect register in command '{self.name}'")
+            raise CommandError(self.name)
 
     def perform(self, control_unit):
         return
@@ -399,6 +413,7 @@ class Rmd(Operation):
             control_unit.tick()
 
         control_unit.select_address(None)
+
 
 class In(Operation):
     def perform(self, control_unit):

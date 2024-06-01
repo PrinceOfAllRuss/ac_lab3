@@ -33,10 +33,10 @@ def get_variable_name(data, i):
 
 def get_command_args(machine_code, index, data, j):
     new_el = re.sub(r",", "", data[j])
-    if not re.search(r"[a-zA-Z_@]+", new_el) is None:
+    if re.search(r"[a-zA-Z_@]+", new_el) is not None:
         machine_code += f'"{new_el}"'
     else:
-        machine_code += f'{new_el}'
+        machine_code += f"{new_el}"
 
     if j == len(data) - 1:
         machine_code += "]},\n"

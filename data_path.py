@@ -12,6 +12,7 @@ class DataPath:
 
     def set_left_register_address(self, address):
         self.registers[-2] = address
+
     def zero(self):
         return self.registers[-3] == 0
 
@@ -76,6 +77,7 @@ class DataPath:
         else:
             print("Now it doesn't work")
         return new_value
+
 
 actions_for_alu = {
     "+": lambda x, y: x + y,
